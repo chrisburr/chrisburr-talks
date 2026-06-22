@@ -6,7 +6,9 @@ scripts/, theme/, node_modules/ and dotted dirs), reads the YAML frontmatter
 from each `slides.md` (title, date, description), and writes an index.html
 linking to the built HTML and PDF for each deck, newest first.
 
-Styled with the cburr palette. Invoked by `pixi run index`.
+The landing page has its own look — deliberately *not* the slide theme: the
+cloud-chamber photo fills the viewport and the talks sit in translucent
+frosted-glass cards over it, in a clean system sans. Invoked by `pixi run index`.
 """
 from __future__ import annotations
 
@@ -16,40 +18,24 @@ import html
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FONTS = ROOT / "theme" / "fonts"
+ASSETS = ROOT / "theme" / "assets"
 EXCLUDE = {"reference", "scripts", "theme", "node_modules", "assets"}
 
-# (file, family, weight, style) — embedded so the index matches the deck
-# typography on GitHub Pages without depending on system-installed fonts.
-EMBED_FONTS = [
-    ("Overlock-Regular.ttf", "Overlock", 400, "normal"),
-    ("Overlock-Italic.ttf", "Overlock", 400, "italic"),
-    ("Overlock-Bold.ttf", "Overlock", 700, "normal"),
-    ("Overlock-Black.ttf", "Overlock", 900, "normal"),
-    ("FiraMono-Regular.ttf", "Fira Mono", 400, "normal"),
-]
+# Clean system-sans stacks — the landing page intentionally does NOT use
+# Overlock (that's the slide voice); these need no embedding.
+FONT_SANS = (
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, '
+    "Helvetica, Arial, sans-serif"
+)
+FONT_MONO = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace'
 
 
-def font_face_css() -> str:
-    blocks = []
-    for fname, family, weight, style in EMBED_FONTS:
-        path = FONTS / fname
-        if not path.exists():
-            continue
-        b64 = base64.b64encode(path.read_bytes()).decode()
-        blocks.append(
-            f'  @font-face {{ font-family: "{family}"; font-weight: {weight}; '
-            f"font-style: {style}; font-display: swap; "
-            f'src: url("data:font/ttf;base64,{b64}") format("truetype"); }}'
-        )
-    return "\n".join(blocks)
-
-INK = "#4A1789"
-INK_SOFT = "#6A3FA8"
-GOLD = "#F4C20D"
-PAPER = "#FFFFFF"
-MUTED = "#6C7280"
-RULE = "rgba(74, 23, 137, 0.18)"
+def cloud_chamber_uri() -> str:
+    """The masthead photo as a base64 data URI, so the page is self-contained."""
+    img = ASSETS / "cloud-chamber.jpeg"
+    if not img.exists():
+        return ""
+    return "data:image/jpeg;base64," + base64.b64encode(img.read_bytes()).decode()
 
 
 def parse_frontmatter(md: Path) -> dict[str, str]:
@@ -114,12 +100,12 @@ def render(decks: list[dict]) -> str:
     for deck in decks:
         title = html.escape(deck["title"])
         desc = html.escape(deck["description"])
-        date_str = html.escape(deck["date_str"])
+        date_str = html.escape(deck["date_str"]).upper()
         links = []
         if deck["html"]:
-            links.append(f'<a class="btn" href="{html.escape(deck["html"])}">View&nbsp;slides</a>')
+            links.append(f'<a class="btn primary" href="{html.escape(deck["html"])}">View&nbsp;slides</a>')
         if deck["pdf"]:
-            links.append(f'<a class="btn pdf" href="{html.escape(deck["pdf"])}">PDF</a>')
+            links.append(f'<a class="btn" href="{html.escape(deck["pdf"])}">PDF</a>')
         if not links:
             links.append('<span class="unbuilt">not built yet</span>')
         cards.append(
@@ -130,7 +116,8 @@ def render(decks: list[dict]) -> str:
         <div class="links">{''.join(links)}</div>
       </li>"""
         )
-    body = "\n".join(cards) if cards else '      <li class="empty">No presentations built yet.</li>'
+    body = "\n".join(cards) if cards else '      <li class="card empty">No presentations built yet.</li>'
+    count = f"{len(decks)} presentation{'s' if len(decks) != 1 else ''}"
 
     return f"""<!doctype html>
 <html lang="en">
@@ -139,72 +126,106 @@ def render(decks: list[dict]) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Talks &middot; Chris Burr</title>
 <style>
-{font_face_css()}
-  :root {{
-    --ink: {INK}; --ink-soft: {INK_SOFT}; --gold: {GOLD};
-    --paper: {PAPER}; --muted: {MUTED}; --rule: {RULE};
-  }}
   * {{ box-sizing: border-box; }}
-  html, body {{ margin: 0; background: var(--paper); color: var(--ink); }}
+  html, body {{ margin: 0; }}
   body {{
-    font-family: "Overlock", Georgia, serif;
-    line-height: 1.3;
+    font-family: {FONT_SANS};
+    line-height: 1.4;
+    color: #f3f0fb;
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
   }}
-  header.masthead {{
-    background: var(--ink);
-    color: var(--paper);
-    padding: 56px 8vw 40px;
+  /* Cloud-chamber fills the viewport and stays put while content scrolls; a
+     purple-tinted scrim darkens it so the frosted cards read clearly. */
+  body::before {{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, rgba(20,10,45,0.55), rgba(20,10,45,0.68)),
+      url("{cloud_chamber_uri()}") center / cover no-repeat;
   }}
-  header.masthead h1 {{ margin: 0; font-size: 48px; font-weight: 900; letter-spacing: -0.01em; }}
-  header.masthead p {{ margin: 10px 0 0; font-size: 20px; opacity: 0.85; }}
-  main {{ max-width: 980px; margin: 0 auto; padding: 40px 8vw 80px; }}
-  ul.decks {{ list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; }}
+  .wrap {{ max-width: 840px; margin: 0 auto; padding: 7vh 24px 64px; }}
+
+  /* Header — its own frosted panel */
+  .masthead {{
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 30px 34px;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }}
+  .masthead h1 {{ margin: 0; font-size: clamp(34px, 6vw, 52px); font-weight: 800; letter-spacing: -0.02em; }}
+  .masthead p {{
+    margin: 8px 0 0; font-size: 16px; letter-spacing: 0.04em;
+    text-transform: uppercase; color: rgba(243,240,251,0.78);
+    font-family: {FONT_MONO};
+  }}
+
+  ul.decks {{ list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }}
+
+  /* Talk cards — frosted glass */
   .card {{
-    border: 1px solid var(--rule);
-    border-left: 4px solid var(--ink);
-    padding: 22px 26px;
+    backdrop-filter: blur(14px) saturate(125%);
+    -webkit-backdrop-filter: blur(14px) saturate(125%);
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }}
+  .card:hover {{
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.32);
   }}
   .card .meta {{
-    font-family: "Fira Mono", Menlo, monospace;
-    font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--muted);
+    font-family: {FONT_MONO};
+    font-size: 12px; letter-spacing: 0.12em;
+    color: rgba(243,240,251,0.72);
   }}
-  .card h2 {{ margin: 6px 0 0; font-size: 28px; font-weight: 700; color: var(--ink); }}
-  .card .desc {{ margin: 8px 0 0; font-size: 18px; color: var(--ink); }}
-  .links {{ margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }}
+  .card h2 {{ margin: 8px 0 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }}
+  .card .desc {{ margin: 8px 0 0; font-size: 16px; color: rgba(243,240,251,0.82); }}
+  .card.empty {{ text-align: center; color: rgba(243,240,251,0.7); }}
+
+  .links {{ margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }}
   a.btn {{
     display: inline-block;
-    font-size: 16px; font-weight: 700;
+    font-size: 15px; font-weight: 600;
     text-decoration: none;
-    color: var(--paper); background: var(--ink);
-    padding: 8px 18px;
+    padding: 9px 18px; border-radius: 999px;
+    color: #fff; border: 1px solid rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.06);
+    transition: background 0.15s ease, color 0.15s ease;
   }}
-  a.btn:hover {{ background: var(--ink-soft); }}
-  a.btn.pdf {{ background: var(--paper); color: var(--ink); border: 1px solid var(--ink); }}
-  a.btn.pdf:hover {{ background: rgba(74,23,137,0.06); }}
-  .unbuilt {{ color: var(--muted); font-style: italic; }}
-  .empty {{ color: var(--muted); font-style: italic; list-style: none; }}
+  a.btn:hover {{ background: rgba(255,255,255,0.18); }}
+  a.btn.primary {{ background: rgba(255,255,255,0.92); color: #2a0f52; border-color: transparent; }}
+  a.btn.primary:hover {{ background: #fff; }}
+  .unbuilt {{ color: rgba(243,240,251,0.6); font-style: italic; }}
+
   footer {{
-    max-width: 980px; margin: 0 auto; padding: 0 8vw 60px;
-    color: var(--muted); font-size: 15px; font-style: italic;
+    margin-top: 30px; text-align: center;
+    color: rgba(243,240,251,0.7); font-size: 14px;
   }}
-  footer a {{ color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }}
+  footer a {{ color: #fff; text-decoration: underline; text-underline-offset: 3px; }}
 </style>
 </head>
 <body>
-  <header class="masthead">
-    <h1>Talks</h1>
-    <p>Chris Burr &middot; CERN / LHCb</p>
-  </header>
-  <main>
+  <div class="wrap">
+    <header class="masthead">
+      <h1>Talks</h1>
+      <p>Chris Burr &middot; CERN / LHCb</p>
+    </header>
     <ul class="decks">
 {body}
     </ul>
-  </main>
-  <footer>
-    Built with <a href="https://marp.app/">Marp</a> &middot; {len(decks)} presentation{'s' if len(decks) != 1 else ''}.
-  </footer>
+    <footer>Built with <a href="https://marp.app/">Marp</a> &middot; {count}</footer>
+  </div>
 </body>
 </html>
 """
