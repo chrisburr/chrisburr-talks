@@ -16,7 +16,7 @@ description: ""
 - Follow up to my [talk at the Computing workshop in January](https://indico.cern.ch/event/1583864/contributions/6885847/)
 
 <figure>
-  <img src="assets/2026-01-conda-workshop-slide20.png" alt="Conclusions slide from the January 2026 Conda talk">
+  <img src="assets/2026-01-conda-workshop-slide20.jpg" alt="Conclusions slide from the January 2026 Conda talk">
 </figure>
 
 - I'm not going to talk about using conda for building the stack<sup>*</sup>
@@ -159,7 +159,7 @@ description: ""
 > Looking back at your PyHEP 2019 conda-forge talk (interesting to see how much has stayed the same over 6+ years)
 
 <figure>
-  <img src="assets/pyhep2019-conda-forge-talk.png" alt="The PyHEP 2019 conda-forge talk">
+  <img src="assets/pyhep2019-conda-forge-talk.jpg" alt="The PyHEP 2019 conda-forge talk">
   <figcaption><a href="https://indico.cern.ch/event/833895/contributions/3577783/">Packaging for Python and Beyond &mdash; PyHEP 2019</a></figcaption>
 </figure>
 
