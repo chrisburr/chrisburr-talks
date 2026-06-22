@@ -7,6 +7,7 @@ subtitle: ""
 author: "Chris Burr"
 affiliation: "CERN"
 event: "LHCb Week"
+event_url: "https://indico.cern.ch/event/1696907/contributions/7143130/"
 date: "2026-06-22"
 description: ""
 ---

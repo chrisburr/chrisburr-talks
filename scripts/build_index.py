@@ -15,10 +15,16 @@ from __future__ import annotations
 import base64
 import datetime
 import html
+import json
+import os
+import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "theme" / "assets"
+# Old / external talks not built in this repo (PDF + Indico links only).
+EXTERNAL_TALKS = ROOT / "external-talks.json"
 EXCLUDE = {"reference", "scripts", "theme", "node_modules", "assets"}
 
 # Clean system-sans stacks — the landing page intentionally does NOT use
@@ -36,6 +42,36 @@ def cloud_chamber_uri() -> str:
     if not img.exists():
         return ""
     return "data:image/jpeg;base64," + base64.b64encode(img.read_bytes()).decode()
+
+
+def _parse_repo(remote_url: str) -> str | None:
+    """owner/repo from a git remote URL (ssh or https)."""
+    url = remote_url.strip().removesuffix(".git")
+    m = re.search(r"github\.com[:/]([^/\s]+/[^/\s]+)$", url)
+    return m.group(1) if m else None
+
+
+def github_base() -> str | None:
+    """Base GitHub URL for this repo (e.g. https://github.com/owner/repo).
+
+    Prefers CI's GITHUB_REPOSITORY, else the local git remote; None if neither
+    is available, in which case "Source" links are simply omitted.
+    """
+    server = os.environ.get("GITHUB_SERVER_URL", "https://github.com").rstrip("/")
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if not repo:
+        try:
+            out = subprocess.run(
+                ["git", "config", "--get", "remote.origin.url"],
+                cwd=ROOT, capture_output=True, text=True, check=True,
+            ).stdout
+            repo = _parse_repo(out)
+        except Exception:
+            repo = None
+    return f"{server}/{repo}" if repo else None
+
+
+GITHUB_BASE = github_base()
 
 
 def parse_frontmatter(md: Path) -> dict[str, str]:
@@ -69,6 +105,34 @@ def coerce_date(value: str) -> datetime.date | None:
     return None
 
 
+def external_talks() -> list[dict]:
+    """Old / external talks from external-talks.json (PDF + Indico links only)."""
+    if not EXTERNAL_TALKS.exists():
+        return []
+    try:
+        items = json.loads(EXTERNAL_TALKS.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"  !! could not read {EXTERNAL_TALKS.name}: {exc}")
+        return []
+    out = []
+    for it in items:
+        date = coerce_date(it.get("date", ""))
+        out.append(
+            {
+                "kind": "external",
+                "slug": "",
+                "title": it.get("title") or "Untitled",
+                "description": it.get("description", ""),
+                "date": date,
+                "date_str": date.strftime("%-d %B %Y") if date else "",
+                "event_url": (it.get("event_url") or "").strip(),
+                "pdf": (it.get("pdf") or "").strip() or None,
+                "html": None,
+            }
+        )
+    return out
+
+
 def collect() -> list[dict]:
     decks = []
     for d in sorted(p for p in ROOT.iterdir() if p.is_dir()):
@@ -81,6 +145,7 @@ def collect() -> list[dict]:
         date = coerce_date(fm.get("date", "")) or coerce_date(d.name[:10])
         decks.append(
             {
+                "kind": "local",
                 "slug": d.name,
                 "title": fm.get("title") or d.name,
                 "description": fm.get("description", ""),
@@ -89,11 +154,67 @@ def collect() -> list[dict]:
                 # Link to the deck directory (served by its index.html) for a clean URL.
                 "html": f"{d.name}/" if (d / "index.html").exists() else None,
                 "pdf": f"{d.name}/slides.pdf" if (d / "slides.pdf").exists() else None,
+                "event_url": fm.get("event_url", "").strip(),
             }
         )
+    decks.extend(external_talks())
     # reverse date order; undated decks sort to the bottom
     decks.sort(key=lambda x: (x["date"] or datetime.date.min), reverse=True)
     return decks
+
+
+ARROW = "&#8599;"  # ↗ external-link indicator
+
+
+def _event_label(url: str) -> str:
+    return "Indico" if "indico." in url else "Event"
+
+
+def render_local(deck: dict, title: str, desc: str, date_str: str) -> str:
+    btns = []
+    if deck["html"]:
+        btns.append(f'<a class="btn primary" href="{html.escape(deck["html"])}">View&nbsp;slides</a>')
+    if deck["pdf"]:
+        btns.append(f'<a class="btn" href="{html.escape(deck["pdf"])}">PDF</a>')
+    if not btns:
+        btns.append('<span class="unbuilt">not built yet</span>')
+
+    refs = []
+    if deck["event_url"]:
+        url = html.escape(deck["event_url"])
+        refs.append(f'<a class="reflink" href="{url}" target="_blank" rel="noopener">{_event_label(deck["event_url"])}&nbsp;{ARROW}</a>')
+    if GITHUB_BASE and deck["slug"]:
+        src = f'{html.escape(GITHUB_BASE)}/tree/main/{html.escape(deck["slug"])}'
+        refs.append(f'<a class="reflink" href="{src}" target="_blank" rel="noopener">Source&nbsp;{ARROW}</a>')
+    refs_html = f'<span class="reflinks">{"".join(refs)}</span>' if refs else ""
+
+    return f"""      <li class="card">
+        <div class="meta">{date_str}</div>
+        <h2>{title}</h2>
+        {f'<p class="desc">{desc}</p>' if desc else ''}
+        <div class="links">{''.join(btns)}{refs_html}</div>
+      </li>"""
+
+
+def render_external(deck: dict, title: str, desc: str, date_str: str) -> str:
+    # The whole card is a link to the primary external page; a stretched <a>
+    # overlay makes it clickable, with any extra link sitting above it.
+    primary = deck["event_url"] or deck["pdf"] or "#"
+    tag = _event_label(deck["event_url"]) if deck["event_url"] else "External"
+    meta = f"{date_str} &middot; {tag}" if date_str else tag
+    # A direct PDF in addition to the event page rides above the card overlay.
+    extra = ""
+    if deck["pdf"] and deck["event_url"]:
+        extra = (f'<div class="links"><a class="reflink ontop" href="{html.escape(deck["pdf"])}" '
+                 f'target="_blank" rel="noopener">PDF&nbsp;{ARROW}</a></div>')
+    return f"""      <li class="card external">
+        <a class="stretched" href="{html.escape(primary)}" target="_blank" rel="noopener" aria-label="{title} (opens externally)"></a>
+        <span class="ext-arrow">{ARROW}</span>
+        <div class="meta">{meta}</div>
+        <h2>{title}</h2>
+        {f'<p class="desc">{desc}</p>' if desc else ''}
+        {extra}
+      </li>"""
 
 
 def render(decks: list[dict]) -> str:
@@ -102,23 +223,12 @@ def render(decks: list[dict]) -> str:
         title = html.escape(deck["title"])
         desc = html.escape(deck["description"])
         date_str = html.escape(deck["date_str"]).upper()
-        links = []
-        if deck["html"]:
-            links.append(f'<a class="btn primary" href="{html.escape(deck["html"])}">View&nbsp;slides</a>')
-        if deck["pdf"]:
-            links.append(f'<a class="btn" href="{html.escape(deck["pdf"])}">PDF</a>')
-        if not links:
-            links.append('<span class="unbuilt">not built yet</span>')
-        cards.append(
-            f"""      <li class="card">
-        <div class="meta">{date_str}</div>
-        <h2>{title}</h2>
-        {f'<p class="desc">{desc}</p>' if desc else ''}
-        <div class="links">{''.join(links)}</div>
-      </li>"""
-        )
+        if deck["kind"] == "external":
+            cards.append(render_external(deck, title, desc, date_str))
+        else:
+            cards.append(render_local(deck, title, desc, date_str))
     body = "\n".join(cards) if cards else '      <li class="card empty">No presentations built yet.</li>'
-    count = f"{len(decks)} presentation{'s' if len(decks) != 1 else ''}"
+    count = f"{len(decks)} talk{'s' if len(decks) != 1 else ''}"
 
     return f"""<!doctype html>
 <html lang="en">
@@ -208,6 +318,27 @@ def render(decks: list[dict]) -> str:
   a.btn.primary {{ background: rgba(255,255,255,0.92); color: #2a0f52; border-color: transparent; }}
   a.btn.primary:hover {{ background: #fff; }}
   .unbuilt {{ color: rgba(243,240,251,0.6); font-style: italic; }}
+
+  /* Secondary reference links (Indico / Source), pushed to the right */
+  .reflinks {{ margin-left: auto; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }}
+  a.reflink {{
+    font-size: 14px; text-decoration: none; white-space: nowrap;
+    color: rgba(243,240,251,0.82);
+    border-bottom: 1px solid rgba(255,255,255,0.28); padding-bottom: 1px;
+  }}
+  a.reflink:hover {{ color: #fff; border-bottom-color: #fff; }}
+
+  /* External talks — the whole card is a link (stretched overlay) */
+  .card.external {{ position: relative; }}
+  .card.external h2 {{ margin-top: 4px; padding-right: 28px; }}
+  a.stretched {{ position: absolute; inset: 0; border-radius: inherit; z-index: 0; }}
+  .card.external .ext-arrow {{
+    position: absolute; top: 22px; right: 26px; z-index: 1;
+    font-size: 22px; line-height: 1; color: rgba(243,240,251,0.85);
+  }}
+  .card.external:hover .ext-arrow {{ color: #fff; }}
+  .card.external .meta, .card.external h2, .card.external .desc {{ position: relative; z-index: 1; pointer-events: none; }}
+  .card.external a.ontop {{ position: relative; z-index: 1; }}  /* clickable over the overlay */
 
   footer {{
     margin-top: 30px; text-align: center;

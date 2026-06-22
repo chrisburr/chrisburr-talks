@@ -25,6 +25,7 @@ subtitle: ""
 author: "Chris Burr"
 affiliation: "CERN"
 event: ""
+event_url: ""
 date: "{date}"
 description: ""
 ---

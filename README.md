@@ -32,7 +32,28 @@ pixi run index                      # regenerate index.html
 
 `pixi run build` and `pixi run index` also run automatically on every push to
 `main` (see `.github/workflows/deploy.yml`), which publishes `index.html` and
-all presentation folders to GitHub Pages.
+all presentation folders to GitHub Pages. Each deck is served at a clean
+directory URL (`…/<deck>/`, via its `index.html`).
+
+### The index page
+
+The landing page (frosted-glass, built by `build_index.py`) lists every talk,
+newest first. Each built deck shows **View slides** / **PDF**, plus **Indico**
+(if the deck sets `event_url`) and a **Source** link to its folder on GitHub
+(derived from the git remote). Old talks not built in this repo can be listed
+too — add them to **`external-talks.json`**, where each entry is a whole-card
+external link:
+
+```json
+[
+  {
+    "title": "Analysis Productions: …",
+    "date": "2026-05-28",
+    "event_url": "https://indico.cern.ch/event/…/",
+    "pdf": "https://…"          // optional; omit if there's only an event page
+  }
+]
+```
 
 ## Editing in VS Code
 
@@ -95,6 +116,7 @@ subtitle: ""                          # optional one-liner under the title
 author: "Chris Burr"                  # cover author (defaults to Chris Burr)
 affiliation: "CERN"                   # e.g. "CERN · on behalf of the LHCb collaboration"
 event: "LHCb Week"                    # cover kicker, with the date
+event_url: "https://indico.cern.ch/…" # optional; adds an Indico/event link on the index
 date: "2026-06-22"                    # ISO date → formatted; also the kicker
 ---
 ```
