@@ -2,7 +2,7 @@
 marp: true
 theme: cburr
 paginate: true
-title: "Conda, Pixi and RatterFS"
+title: "Conda, Pixi and RattlerFS"
 subtitle: ""
 author: "Chris Burr"
 affiliation: "CERN"
