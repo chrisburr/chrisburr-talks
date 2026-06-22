@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":pinDigests",
+    ":maintainLockFilesWeekly"
+  ],
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "strict",
+  "enabledManagers": ["npm", "pixi", "github-actions"],
+  "lockFileMaintenance": { "enabled": true }
+}

@@ -1,0 +1,87 @@
+name: Deploy slides
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege by default; the deploy job below grants itself the
+# pages/id-token scopes it needs. The build job only reads the repo.
+permissions:
+  contents: read
+
+# Only one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Marp shells out to Chrome for PDF export; the GitHub runner is
+      # non-root but Chrome's sandbox is unhappy here, so disable it.
+      CHROME_NO_SANDBOX: "true"
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
+        with:
+          cache: true
+
+      - name: Install Chromium (for Marp PDF export)
+        id: chrome
+        uses: browser-actions/setup-chrome@c785b87e244131f27c9f19c1a33e2ead956ab7ce # v1
+        with:
+          chrome-version: stable
+
+      - name: Point Marp at Chromium
+        run: echo "CHROME_PATH=${{ steps.chrome.outputs.chrome-path }}" >> "$GITHUB_ENV"
+
+      - name: Build all decks (HTML + PDF)
+        run: pixi run build
+
+      - name: Generate index.html
+        run: pixi run index
+
+      - name: Assemble site (index.html + presentation folders)
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp index.html _site/
+          for d in */ ; do
+            case "$d" in
+              reference/|theme/|scripts/|node_modules/|_site/|.github/) continue ;;
+            esac
+            if [ -f "${d}slides.md" ]; then
+              echo "publishing ${d}"
+              mkdir -p "_site/${d}"
+              cp -r "${d}." "_site/${d}"
+            fi
+          done
+
+      - name: Configure Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # Only the deploy job needs to publish Pages and mint the OIDC token.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

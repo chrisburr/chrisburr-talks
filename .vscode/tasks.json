@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Live-reloading Marp server for the deck that the ACTIVE FILE lives in.
+      // Open it in VS Code's Simple Browser at http://localhost:8080/slides.md
+      // (keybinding ctrl+alt+p, or "Simple Browser: Show") for a faithful,
+      // auto-refreshing preview that includes the generated cover/kicker/footer.
+      "label": "Marp: dev server (current deck)",
+      "type": "shell",
+      "command": "pixi run dev ${relativeFileDirname}",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "detail": "Watch + serve the active file's deck on http://localhost:8080/slides.md"
+    },
+    {
+      "label": "Marp: build all (HTML + PDF)",
+      "type": "shell",
+      "command": "pixi run build",
+      "group": "build",
+      "problemMatcher": [],
+      "detail": "Build every deck to HTML and PDF in place."
+    },
+    {
+      "label": "Marp: rebuild index",
+      "type": "shell",
+      "command": "pixi run index",
+      "problemMatcher": [],
+      "detail": "Regenerate index.html from the built decks."
+    }
+  ]
+}

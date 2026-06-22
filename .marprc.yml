@@ -1,0 +1,5 @@
+themeSet: ./theme/
+html: true
+# Custom engine: auto-generates the title-slide kicker from event/date
+# front-matter (see scripts/marp-engine.mjs). Applies to build and dev.
+engine: ./scripts/marp-engine.mjs

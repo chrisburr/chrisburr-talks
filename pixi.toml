@@ -1,0 +1,38 @@
+[workspace]
+name = "presentations"
+description = "Chris Burr's CERN/LHCb talk decks, built with Marp"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[dependencies]
+nodejs = ">=20"
+python = ">=3.10"
+
+# ---- Internal: install marp-cli (and friends) from the lockfile ----
+# `npm ci` installs exactly what package-lock.json pins and fails (rather than
+# silently rewriting the lock) if it drifts from package.json, so local and CI
+# builds are reproducible. The 7-day cooldown lives in .npmrc / renovate.json.
+[tasks._install]
+cmd = "npm ci --no-fund --no-audit --loglevel=error"
+inputs = ["package.json", "package-lock.json"]
+outputs = ["node_modules/.bin/marp"]
+
+# ---- build: every */slides.md -> slides.html + slides.pdf, in place ----
+[tasks.build]
+depends-on = ["_install"]
+cmd = "python scripts/build.py"
+
+# ---- dev FOLDER: live watch + server for one deck ----
+[tasks.dev]
+depends-on = ["_install"]
+args = ["folder"]
+cmd = "npx marp --watch --server --theme-set ./theme/ --html {{ folder }}"
+
+# ---- new NAME: scaffold NAME/slides.md from the template ----
+[tasks.new]
+args = ["name"]
+cmd = "python scripts/new_presentation.py {{ name }}"
+
+# ---- index: regenerate index.html ----
+[tasks.index]
+cmd = "python scripts/build_index.py"
