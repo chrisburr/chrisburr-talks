@@ -86,7 +86,8 @@ def collect() -> list[dict]:
                 "description": fm.get("description", ""),
                 "date": date,
                 "date_str": date.strftime("%-d %B %Y") if date else "",
-                "html": f"{d.name}/slides.html" if (d / "slides.html").exists() else None,
+                # Link to the deck directory (served by its index.html) for a clean URL.
+                "html": f"{d.name}/" if (d / "index.html").exists() else None,
                 "pdf": f"{d.name}/slides.pdf" if (d / "slides.pdf").exists() else None,
             }
         )

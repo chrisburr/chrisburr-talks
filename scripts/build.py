@@ -57,7 +57,9 @@ def main() -> int:
     failures = []
     for deck in decks:
         src = str((deck / "slides.md").relative_to(ROOT))
-        html = str((deck / "slides.html").relative_to(ROOT))
+        # Build the deck to index.html so the bare directory URL (…/deck/)
+        # serves it on GitHub Pages; the PDF stays slides.pdf.
+        html = str((deck / "index.html").relative_to(ROOT))
         pdf = str((deck / "slides.pdf").relative_to(ROOT))
         print(f"==> {deck.name}")
         try:
