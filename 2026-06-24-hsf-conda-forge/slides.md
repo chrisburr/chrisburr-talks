@@ -19,6 +19,7 @@ description: "Distributing the HEP software ecosystem on conda-forge: shared bui
 
 - Software packaging is a complex topic and this is a short talk
 - For the purpose of this talk:
+<br>
 
 > Software packaging is a means to get software in a reproducible and reliable way
 
