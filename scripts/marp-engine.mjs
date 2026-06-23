@@ -104,7 +104,7 @@ function buildTitleSlide(fm) {
 // than two top-level bullets (nothing to reveal incrementally).
 function buildSteps(slide) {
   const lines = slide.split('\n')
-  const isTop = (l) => /^(?:[-*+]|\d+[.)])\s+/.test(l) // top-level bullet or `1.` number (column 0)
+  const isTop = (l) => /^(?:[-*+]|\d+[.)]|#{2,6})\s+/.test(l) // top-level bullet, `1.` number, or `##`+ heading (column 0)
 
   const first = lines.findIndex(isTop)
   if (first < 0) return slide

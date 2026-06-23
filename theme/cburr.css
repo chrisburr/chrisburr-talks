@@ -244,6 +244,9 @@ section h2, section .h2 {
   color: var(--ink);
   margin: 0 0 var(--sp-4);
 }
+/* A mid-slide heading inside a build slide (e.g. a centred "ecosystem"
+   callout above a chip cluster) is centred, with room above it. */
+section.build h2 { text-align: center; margin-top: var(--sp-5); }
 section h3, section .h3 {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -385,6 +388,33 @@ section .cols3 {
 }
 section .cols3 > * > :first-child { margin-top: 0; }
 section .cols3 p { margin: 0 0 var(--sp-1); }
+
+/* Ecosystem chips — a centred cluster of rounded tags (e.g. the conda tool
+   ecosystem). `.core` marks the headline members (filled instead of outlined). */
+section .chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-3);
+  max-width: 72%;
+  margin: var(--sp-6) auto 0;
+}
+section .chips span {
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  line-height: 1;
+  white-space: nowrap;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--rule);
+  color: var(--ink);
+  background: var(--paper);
+}
+section .chips .core {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
 /* Small image-source / attribution line (e.g. an xkcd credit). */
 section .src {
   margin: var(--sp-2) 0 0;

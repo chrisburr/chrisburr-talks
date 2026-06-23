@@ -61,7 +61,7 @@ build & iterate
 
 <!-- _class: build -->
 
-<img class="overlay br" src="assets/conda-logo.svg" alt="conda" style="--overlay-h: 130px">
+<img class="overlay br" src="assets/conda-logo.svg" alt="conda" style="--overlay-h: 90px">
 
 1. Installer tools for software packages and their dependencies:
    - `conda create ...`
@@ -79,16 +79,16 @@ build & iterate
 
 <!-- _class: build -->
 
-1. An operating system wide package manager (like `apt` or `yum`)
+1. An operating system-wide package manager (like `apt` or `yum`)
     - In the context of HSF use cases these aren't very interesting
 
-1. A language specific package manager (like `pip`)
-    - Conda packaging format is **language agnostic**
+1. A language-specific package manager (like `pip`)
+    - conda packaging format is **language-agnostic**
     - Can package C/C++, Fortran, Rust, Python, Go, R ...
 
 1. Anaconda, Inc. (the company)
-    - Conda is a community project with a varied elected steering council
-    - Conda-forge packages are **free and open source**
+    - conda is a community project with a varied elected steering council
+    - conda-forge packages are **free and open source**
     - Anaconda supports conda-forge, but is only a small fraction of the community
     - Anaconda's paid offerings are not interesting to HEP users
 
@@ -168,10 +168,10 @@ build & iterate
 
 <!-- _class: build -->
 
-- Conda is primarily a binary package manager
+- conda is primarily a binary package manager
      - Recipes are used to build binaries for multiple platforms
      - Binaries are distributed via "channels", the most popular of which is [conda-forge](https://anaconda.org/channels/conda-forge)
-- Potentially a different model that what you're used to, but is a very pragmatic approach
+- Potentially a different model than what you're used to, but is a very pragmatic approach
 - For two binaries to be compatible it doesn't matter:<sup>†</sup>
      - Which C++ compiler was used to build them
      - Which C++ standard is used
@@ -190,7 +190,7 @@ build & iterate
 - Shared CI and distribution infrastructure.
 - ~7800 contributors, 33,000+ packages, 43 billion+ downloads
      - contributors maintain one or more packages
-     - core team maintains the infrastructure keeps the ecosystem healthy
+     - core team maintains the infrastructure and keeps the ecosystem healthy
 - Heavy use of automation to manage version updates, rebuilds, and ABI change "migrations"
 - Isn't frozen: you can contribute to add / update / fix packages
    - Uploaded binaries are immutable, associated metadata isn't
@@ -207,7 +207,7 @@ build & iterate
 
 - A community project to get **as much HEP software as possible** onto conda-forge.
    - Directed by: Chris Burr, <br>Matthew Feickert, Lindsey Gray, Giordon Stark, ...you!
-- Contributors across HEP: ATLAS, Belle II, CMS, LHCb, IRIS-HEP, LEGEND, ROOT, Scikit-HEP, SHiP, ROOT, DIRAC, theory/pheno...
+- Contributors across HEP: ATLAS, Belle II, CMS, DIRAC, IRIS-HEP, LEGEND, LHCb, ROOT, Scikit-HEP, SHiP, theory/pheno...
 - **120+ HEP packages** already: ROOT, Pythia8, FastJet, Awkward Array, Rivet, CMS Combine, ...
 - Installing should be trivial
 
@@ -258,7 +258,7 @@ build & iterate
 
 ---
 
-# An aside: Use of Conda in LHCb
+# An aside: Use of conda in LHCb
 
 - Most LHCb software is on conda-forge (even extremely LHCb-specific software)
 - Already used for:
@@ -267,7 +267,7 @@ build & iterate
      - Hosting web services
      - User analysis environments on CVMFS (lb-conda)
      - Local user environments
-- Notably exception is the "physics stack"
+- Notable exception is the "physics stack"
      - Have been experimenting with this more recently
      - Extremely promising, main questions are around the nicest way to integrate it
 
@@ -275,9 +275,9 @@ build & iterate
 
 # Summary
 
-- Conda-forge provides the recipes/binaries
-- The Conda community provides the tooling
-- HEP packaging coordination coordinates efforts within HEP
+- conda-forge provides the recipes/binaries
+- The conda community provides the tooling
+- HEP Packaging Coordination coordinates efforts within HEP
 
 <div class="fineprint">
 
