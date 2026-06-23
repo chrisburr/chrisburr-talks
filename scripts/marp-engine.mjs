@@ -66,6 +66,18 @@ function buildTitleSlide(fm) {
   const author = fm.author || DEFAULT_AUTHOR
   const affiliation = fm.affiliation || DEFAULT_AFFILIATION
   const subtitle = (fm.subtitle || '').trim()
+  // Optional extra cover logos, sat after the default LHCb + CERN marks (e.g.
+  // co-presenting institutions on a joint talk). Front-matter is scalar-only,
+  // so list them comma-separated, each as `path` or `path|Alt text`:
+  //   extra_logos: "assets/uw-logo.png|UW, assets/iris-hep-logo.png|IRIS-HEP"
+  const extraLogos = (fm.extra_logos || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [src, alt = ''] = entry.split('|').map((s) => s.trim())
+      return `  <img class="extra" src="${src}" alt="${escapeHtml(alt)}">`
+    })
   return [
     '<!-- _class: title -->',
     '<!-- _paginate: false -->',
@@ -81,6 +93,7 @@ function buildTitleSlide(fm) {
     '<div class="logos">',
     '  <img class="lhcb" src="assets/lhcb-logo.png" alt="LHCb">',
     '  <img class="cern" src="assets/cern-logo.png" alt="CERN">',
+    ...extraLogos,
     '</div>',
   ].join('\n')
 }
@@ -91,7 +104,7 @@ function buildTitleSlide(fm) {
 // than two top-level bullets (nothing to reveal incrementally).
 function buildSteps(slide) {
   const lines = slide.split('\n')
-  const isTop = (l) => /^[-*+]\s+/.test(l) // top-level bullet (column 0)
+  const isTop = (l) => /^(?:[-*+]|\d+[.)])\s+/.test(l) // top-level bullet or `1.` number (column 0)
 
   const first = lines.findIndex(isTop)
   if (first < 0) return slide
@@ -104,7 +117,12 @@ function buildSteps(slide) {
   const preamble = lines.slice(0, first).join('\n').replace(/\s+$/, '')
   const groups = starts.map((s, gi) => {
     const end = gi + 1 < starts.length ? starts[gi + 1] : lines.length
-    return lines.slice(s, end).join('\n').replace(/\s+$/, '')
+    const slice = lines.slice(s, end)
+    // Each group renders as its own list, so an ordered list would restart at 1
+    // in every group — renumber the leading marker to the group's position so
+    // the numbers stay 1, 2, 3… across reveal steps. (No-op for `-`/`*`/`+`.)
+    slice[0] = slice[0].replace(/^(\d+)([.)])/, `${gi + 1}$2`)
+    return slice.join('\n').replace(/\s+$/, '')
   })
 
   const N = groups.length
