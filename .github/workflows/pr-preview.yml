@@ -1,0 +1,86 @@
+name: PR slides preview
+
+# Builds the decks on every PR — both a CI gate (the build must succeed before
+# merge) and a downloadable preview (rendered HTML + PDFs as a run artifact,
+# linked from a sticky PR comment).
+
+on:
+  pull_request:
+    branches: [main]
+
+# Least privilege: read the repo, and write the sticky comment. (Fork PRs get a
+# read-only token, so the comment step is skipped for them — the build still runs.)
+permissions:
+  contents: read
+  pull-requests: write
+
+# One build per PR; newer pushes cancel older runs.
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CHROME_NO_SANDBOX: "true"
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+        with:
+          cache: true
+
+      - name: Install Chromium (for Marp PDF export)
+        id: chrome
+        uses: browser-actions/setup-chrome@2e1d749697dd1612b833dba4a722266286fbefcd # v2
+        with:
+          chrome-version: stable
+
+      - name: Point Marp at Chromium
+        run: echo "CHROME_PATH=${{ steps.chrome.outputs.chrome-path }}" >> "$GITHUB_ENV"
+
+      - name: Build all decks (HTML + PDF)
+        run: pixi run build
+
+      - name: Generate index.html
+        run: pixi run index
+
+      - name: Assemble preview (index.html + presentation folders)
+        run: |
+          rm -rf _preview
+          mkdir -p _preview
+          cp index.html _preview/
+          for d in */ ; do
+            case "$d" in
+              reference/|theme/|scripts/|node_modules/|_preview/|.github/) continue ;;
+            esac
+            if [ -f "${d}slides.md" ]; then
+              echo "previewing ${d}"
+              mkdir -p "_preview/${d}"
+              cp -r "${d}." "_preview/${d}"
+            fi
+          done
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: slides-pr-${{ github.event.number }}
+          path: _preview
+          retention-days: 14
+
+      # Skipped automatically for fork PRs (read-only token).
+      - name: Comment with the preview link
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3
+        with:
+          header: slides-preview
+          message: |
+            📊 **Slides preview built** — commit `${{ github.event.pull_request.head.sha }}`
+
+            Download the rendered slides from this run's **[artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)** (`slides-pr-${{ github.event.number }}`).
+
+            After unzipping, open a deck's **`slides.pdf`** to flip through it, or **`<deck>/index.html`** for the live version.

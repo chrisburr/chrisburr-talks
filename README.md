@@ -35,6 +35,10 @@ pixi run index                      # regenerate index.html
 all presentation folders to GitHub Pages. Each deck is served at a clean
 directory URL (`…/<deck>/`, via its `index.html`).
 
+Every **pull request** builds the decks too (`.github/workflows/pr-preview.yml`)
+— a CI gate that fails if a deck stops building, and a preview: the rendered
+HTML + PDFs are uploaded as a run artifact, linked from a sticky PR comment.
+
 ### The index page
 
 The landing page (frosted-glass, built by `build_index.py`) lists every talk,
