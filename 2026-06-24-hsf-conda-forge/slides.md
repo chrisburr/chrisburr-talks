@@ -294,3 +294,28 @@ Links:
 <!-- _class: section -->
 
 # Questions?
+
+---
+
+<!-- _class: section -->
+
+# Backup
+
+---
+
+# What does typical end-user use look like?
+<!-- _class: build -->
+
+```
+$ pixi init example && cd example  # create workspace
+$ pixi add contur  # declaratively add tools
+✔ Added contur >=3.1.4,<4
+$ pixi run contur ...  # execute commands or tasks
+$ pixi list rivet  # inspect environments
+Name   Version  Build                 Size  Kind   Source
+rivet  4.1.3    py314h9404863_2  53.69 MiB  conda  https://conda.anaconda.org/conda-forge
+$ pixi shell  # drop into interactive subshells
+
+(debug) $ command -v contur
+/tmp/example/.pixi/envs/default/bin/contur
+```
