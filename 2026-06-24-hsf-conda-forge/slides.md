@@ -133,11 +133,11 @@ build & iterate
 <img class="overlay tr" src="assets/pixi.png" alt="Pixi">
 
 - Workspace model of working
-  - Add a `pixi.toml` to describe the software you need
-  - Can contain multiple environments for different use cases
+  - Add a `pixi.toml` Pixi manifest to describe the software you need
+  - Can contain **multiple environments** and **multiple platforms** <br>for different use cases
   - Can also describe commands to run in the environment ("tasks")
 
-- Pixi then takes care of generating a lock file
+- Pixi then automatically takes care of generating a digest-level lock file
   - Ensures that everyone has the same software installed<sup>*</sup>
   - This should typically be committed to the repository<sup>†</sup>
 
