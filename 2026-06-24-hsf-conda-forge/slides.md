@@ -19,6 +19,7 @@ description: "Distributing the HEP software ecosystem on conda-forge: shared bui
 
 - Software packaging is a complex topic and this is a short talk
 - For the purpose of this talk:
+<br>
 
 > Software packaging is a means to get software in a reproducible and reliable way
 
@@ -56,32 +57,37 @@ build & iterate
 
 ---
 
-# What is Conda?
+# What is the conda **ecosystem**?
 
 <!-- _class: build -->
 
 <img class="overlay br" src="assets/conda-logo.svg" alt="conda" style="--overlay-h: 130px">
 
-1. An install tool for software packages and their dependencies: `conda create ...`
+1. Installer tools for software packages and their dependencies:
+   - `conda create ...`
+   - `pixi init`
 1. A channel for distributing software packages: `conda-forge`
 1. A file format for binary packages: `.conda`
-1. A tool for building packages: `conda-build`
-- **An ecosystem**
+1. Tools for building packages:
+   - `conda-build`
+   - `rattler-build`
+1. Distributed cyberinfrastructure for building conda packages coherently: https://github.com/conda-forge/
 
 ---
 
-# What is conda not?
+# What is the conda ecosystem **not**?
 
 <!-- _class: build -->
 
-1. A system wide package manager (like `apt` or `yum`)
+1. An operating system wide package manager (like `apt` or `yum`)
     - In the context of HSF use cases these aren't very interesting
 
 1. A language specific package manager (like `pip`)
-    - Conda is language agnostic, and can package C/C++ libraries, Fortran, Rust, etc.
+    - Conda packaging format is **language agnostic**
+    - Can package C/C++, Fortran, Rust, Python, Go, R ...
 
-1. Anaconda (the company)
-    - Conda is a community project with a varied steering council
+1. Anaconda, Inc. (the company)
+    - Conda is a community project with a varied elected steering council
     - Conda-forge packages are **free and open source**
     - Anaconda supports conda-forge, but is only a small fraction of the community
     - Anaconda's paid offerings are not interesting to HEP users
@@ -107,11 +113,16 @@ build & iterate
 
 - Compiler toolchains are now much more mature
     - Originally hard to use outside of conda builds
-    - Now they're very mature and well maintained, including CUDA
+    - Now they're very mature and well maintained, [including CUDA](https://github.com/conda-forge/cuda-feedstock/blob/main/recipe/doc/end_user_compile_guide.md)
 - Tooling is much faster
     - Used to advertise getting ROOT in under 5 minutes
-    - Now it can be ~10 seconds
-- Pixi provides a lot of "user experience" improvements
+    - Now it can be **~10 seconds** 🚀
+
+    ```
+    pixi global install root
+    pixi global expose add --environment root pyroot=python
+    ```
+- [Pixi](https://pixi.prefix.dev/) provides a lot of "user experience" improvements
 
 ---
 
@@ -122,11 +133,11 @@ build & iterate
 <img class="overlay tr" src="assets/pixi.png" alt="Pixi">
 
 - Workspace model of working
-  - Add a `pixi.toml` to describe the software you need
-  - Can contain multiple environments for different use cases
+  - Add a `pixi.toml` Pixi manifest to describe the software you need
+  - Can contain **multiple environments** and **multiple platforms** <br>for different use cases
   - Can also describe commands to run in the environment ("tasks")
 
-- Pixi then takes care of generating a lock file
+- Pixi then automatically takes care of generating a digest-level lock file
   - Ensures that everyone has the same software installed<sup>*</sup>
   - This should typically be committed to the repository<sup>†</sup>
 
@@ -159,7 +170,7 @@ build & iterate
 
 - Conda is primarily a binary package manager
      - Recipes are used to build binaries for multiple platforms
-     - Binaries are distributed via channels, the most popular of which is conda-forge
+     - Binaries are distributed via "channels", the most popular of which is [conda-forge](https://anaconda.org/channels/conda-forge)
 - Potentially a different model that what you're used to, but is a very pragmatic approach
 - For two binaries to be compatible it doesn't matter:<sup>†</sup>
      - Which C++ compiler was used to build them
@@ -180,8 +191,12 @@ build & iterate
 - ~7800 contributors, 33,000+ packages, 43 billion+ downloads
      - contributors maintain one or more packages
      - core team maintains the infrastructure keeps the ecosystem healthy
-- Heavy use of automation to manage version updates and rebuilds
-- Isn't frozen, you can contribute to add / update / fix packages
+- Heavy use of automation to manage version updates, rebuilds, and ABI change "migrations"
+- Isn't frozen: you can contribute to add / update / fix packages
+   - Uploaded binaries are immutable, associated metadata isn't
+- HEP leadership:
+   - Chris Burr is member of core leadership team
+   - Chris Burr, Matthew Feickert are members of conda-forge/staged-recipes review team
 
 ---
 
@@ -191,8 +206,9 @@ build & iterate
 <div>
 
 - A community project to get **as much HEP software as possible** onto conda-forge.
+   - Directed by: Chris Burr, <br>Matthew Feickert, Lindsey Gray, Giordon Stark, ...you!
 - Contributors across HEP: ATLAS, Belle II, CMS, LHCb, IRIS-HEP, LEGEND, ROOT, Scikit-HEP, SHiP, ROOT, DIRAC, theory/pheno...
-- **120+ HEP packages** already: ROOT, Pythia8, FastJet, awkward, Rivet, cms-combine, ...
+- **120+ HEP packages** already: ROOT, Pythia8, FastJet, Awkward Array, Rivet, CMS Combine, ...
 - Installing should be trivial
 
 </div>
@@ -200,7 +216,7 @@ build & iterate
 
 <figure>
   <img src="assets/hep-packaging-coordination.png" alt="HEP Packaging Coordination package categories">
-  <figcaption><a href="https://github.com/hep-packaging-coordination">hep-packaging-coordination</a></figcaption>
+  <figcaption><a href="https://hep-packaging-coordination.github.io/.github/">hep-packaging-coordination</a></figcaption>
 </figure>
 
 </div>
@@ -267,7 +283,7 @@ build & iterate
 
 Links:
 
-- HEP Packaging Coordination — <https://github.com/hep-packaging-coordination>
+- HEP Packaging Coordination — <https://hep-packaging-coordination.github.io/.github/>
 - Matthew's CHEP 2026 talk — <https://matthewfeickert-talks.github.io/talk-chep-2026/>
 - "Conda, Pixi and RattlerFS" — <https://talks.chrisburr.me/2026-06-22-pixi-and-rattlerfs/>
 
@@ -278,3 +294,28 @@ Links:
 <!-- _class: section -->
 
 # Questions?
+
+---
+
+<!-- _class: section -->
+
+# Backup
+
+---
+
+# What does typical end-user use look like?
+<!-- _class: build -->
+
+```
+$ pixi init example && cd example  # create workspace
+$ pixi add contur  # declaratively add tools
+✔ Added contur >=3.1.4,<4
+$ pixi run contur ...  # execute commands or tasks
+$ pixi list rivet  # inspect environments
+Name   Version  Build                 Size  Kind   Source
+rivet  4.1.3    py314h9404863_2  53.69 MiB  conda  https://conda.anaconda.org/conda-forge
+$ pixi shell  # drop into interactive subshells
+
+(debug) $ command -v contur
+/tmp/example/.pixi/envs/default/bin/contur
+```
