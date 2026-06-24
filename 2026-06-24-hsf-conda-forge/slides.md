@@ -202,8 +202,9 @@ build & iterate
 <div>
 
 - A community project to get **as much HEP software as possible** onto conda-forge.
+   - Directed by: Chris Burr, <br>Matthew Feickert, Lindsey Gray, Giordon Stark, ...you!
 - Contributors across HEP: ATLAS, Belle II, CMS, LHCb, IRIS-HEP, LEGEND, ROOT, Scikit-HEP, SHiP, ROOT, DIRAC, theory/pheno...
-- **120+ HEP packages** already: ROOT, Pythia8, FastJet, awkward, Rivet, cms-combine, ...
+- **120+ HEP packages** already: ROOT, Pythia8, FastJet, Awkward Array, Rivet, CMS Combine, ...
 - Installing should be trivial
 
 </div>
@@ -211,7 +212,7 @@ build & iterate
 
 <figure>
   <img src="assets/hep-packaging-coordination.png" alt="HEP Packaging Coordination package categories">
-  <figcaption><a href="https://github.com/hep-packaging-coordination">hep-packaging-coordination</a></figcaption>
+  <figcaption><a href="https://hep-packaging-coordination.github.io/.github/">hep-packaging-coordination</a></figcaption>
 </figure>
 
 </div>
@@ -278,7 +279,7 @@ build & iterate
 
 Links:
 
-- HEP Packaging Coordination — <https://github.com/hep-packaging-coordination>
+- HEP Packaging Coordination — <https://hep-packaging-coordination.github.io/.github/>
 - Matthew's CHEP 2026 talk — <https://matthewfeickert-talks.github.io/talk-chep-2026/>
 - "Conda, Pixi and RattlerFS" — <https://talks.chrisburr.me/2026-06-22-pixi-and-rattlerfs/>
 
