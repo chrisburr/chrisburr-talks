@@ -170,7 +170,7 @@ build & iterate
 
 - Conda is primarily a binary package manager
      - Recipes are used to build binaries for multiple platforms
-     - Binaries are distributed via channels, the most popular of which is conda-forge
+     - Binaries are distributed via "channels", the most popular of which is [conda-forge](https://anaconda.org/channels/conda-forge)
 - Potentially a different model that what you're used to, but is a very pragmatic approach
 - For two binaries to be compatible it doesn't matter:<sup>†</sup>
      - Which C++ compiler was used to build them
