@@ -265,7 +265,7 @@ build & iterate
      - User login environment on CVMFS/lxplus
      - All grid middleware
      - Hosting web services
-     - User analysis environments on CVMFS (lb-conda)
+     - User analysis environments on CVMFS ([lb-conda](https://gitlab.cern.ch/lhcb-core/lbcondawrappers))
      - Local user environments
 - Notably exception is the "physics stack"
      - Have been experimenting with this more recently
@@ -304,7 +304,6 @@ Links:
 ---
 
 # What does typical end-user use look like?
-<!-- _class: build -->
 
 ```
 $ pixi init example && cd example  # create workspace
@@ -319,3 +318,33 @@ $ pixi shell  # drop into interactive subshells
 (debug) $ command -v contur
 /tmp/example/.pixi/envs/default/bin/contur
 ```
+
+---
+
+# Example of lb-conda
+
+```
+# ssh <cvmfs connected cluster>
+$ pixi global install lbcondawrappers
+$ lb-conda --list  # list all environments
+default
+Simulation/lbfluka
+...
+QEE/ew-analyses
+...
+$ lb-conda QEE/ew-analyses  # activates env in subshell
+$ conda list  # see full environment available
+```
+
+---
+
+# How do ABI migrations work?
+
+Conda-forge has **excellent automation** that allows for automatic ABI "migration" rebuilds when a package in the [global pinning](https://github.com/conda-forge/conda-forge-pinning-feedstock) changes.
+
+1. Packages are added to the global pinning with an ABI compatibility range (e.g. `'x.x'`)
+1. A new version of a package is released and a bot generates a migrator patch to the global pinning repository, which will "migrate" all affected conda-forge feedstocks to the new version
+1. A migration for the new package version is kicked off resulting in automatic rebuilds of dependent packages
+1. After the migration opens up PRs to update to the new version against all affected packages a bot opens up a global pinning PR to close out the migration and bump the package in the global pinning
+
+Example: [`fastjet-contrib`](https://github.com/conda-forge/fastjet-contrib-feedstock/issues/21#issuecomment-4704911591)
