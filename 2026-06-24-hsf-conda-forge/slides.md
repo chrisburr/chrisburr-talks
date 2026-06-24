@@ -191,8 +191,12 @@ build & iterate
 - ~7800 contributors, 33,000+ packages, 43 billion+ downloads
      - contributors maintain one or more packages
      - core team maintains the infrastructure keeps the ecosystem healthy
-- Heavy use of automation to manage version updates and rebuilds
-- Isn't frozen, you can contribute to add / update / fix packages
+- Heavy use of automation to manage version updates, rebuilds, and ABI change "migrations"
+- Isn't frozen: you can contribute to add / update / fix packages
+   - Uploaded binaries are immutable, associated metadata isn't
+- HEP leadership:
+   - Chris Burr is member of core leadership team
+   - Chris Burr, Matthew Feickert are members of conda-forge/staged-recipes review team
 
 ---
 
