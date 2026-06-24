@@ -57,32 +57,37 @@ build & iterate
 
 ---
 
-# What is Conda?
+# What is the conda **ecosystem**?
 
 <!-- _class: build -->
 
 <img class="overlay br" src="assets/conda-logo.svg" alt="conda" style="--overlay-h: 130px">
 
-1. An install tool for software packages and their dependencies: `conda create ...`
+1. Installer tools for software packages and their dependencies:
+   - `conda create ...`
+   - `pixi init`
 1. A channel for distributing software packages: `conda-forge`
 1. A file format for binary packages: `.conda`
-1. A tool for building packages: `conda-build`
-- **An ecosystem**
+1. Tools for building packages:
+   - `conda-build`
+   - `rattler-build`
+1. Distributed cyberinfrastructure for building conda packages coherently: https://github.com/conda-forge/
 
 ---
 
-# What is conda not?
+# What is the conda ecosystem **not**?
 
 <!-- _class: build -->
 
-1. A system wide package manager (like `apt` or `yum`)
+1. An operating system wide package manager (like `apt` or `yum`)
     - In the context of HSF use cases these aren't very interesting
 
 1. A language specific package manager (like `pip`)
-    - Conda is language agnostic, and can package C/C++ libraries, Fortran, Rust, etc.
+    - Conda packaging format is **language agnostic**
+    - Can package C/C++, Fortran, Rust, Python, Go, R ...
 
-1. Anaconda (the company)
-    - Conda is a community project with a varied steering council
+1. Anaconda, Inc. (the company)
+    - Conda is a community project with a varied elected steering council
     - Conda-forge packages are **free and open source**
     - Anaconda supports conda-forge, but is only a small fraction of the community
     - Anaconda's paid offerings are not interesting to HEP users
