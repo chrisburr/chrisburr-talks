@@ -61,7 +61,11 @@ build & iterate
 
 <!-- _class: build -->
 
-<img class="overlay br" src="assets/conda-logo.svg" alt="conda" style="--overlay-h: 90px">
+<div class="logo-stack">
+  <img src="assets/conda-logo.svg" alt="conda">
+  <img src="assets/conda-forge-logo.svg" alt="conda-forge">
+  <img src="assets/pixi.png" alt="Pixi">
+</div>
 
 1. Installer tools for software packages and their dependencies:
    - `conda create ...`
@@ -118,11 +122,14 @@ build & iterate
     - Used to advertise getting ROOT in under 5 minutes
     - Now it can be **~10 seconds** 🚀
 
-    ```
-    pixi global install root
-    pixi global expose add --environment root pyroot=python
-    ```
+          ~> time pixi exec root -l -b -q -e '1+1'
+          (int) 2
+          ________________________________________________________
+          Executed in   13.64 secs
+
 - [Pixi](https://pixi.prefix.dev/) provides a lot of "user experience" improvements
+
+<img class="overlay tr" src="assets/pixi.png" alt="Pixi">
 
 ---
 
@@ -161,6 +168,12 @@ build & iterate
 - How to build software ("recipes")
 - How to avoid building software ("binaries")
 - How to know it will work together
+     - Build the entire universe for every cosmetic change? (à la Nix<sup>†</sup>)
+     - Rely on compatibility between binaries (à la conda-forge)
+
+<div class="footnotes">
+  <div class="footnote">† Nix is an excellent tool and it's a perfectly valid approach, but I think it's the wrong one for HEP.</div>
+</div>
 
 ---
 
@@ -319,3 +332,103 @@ $ pixi shell  # drop into interactive subshells
 (debug) $ command -v contur
 /tmp/example/.pixi/envs/default/bin/contur
 ```
+
+---
+
+# pixi global install
+
+- Install CLI tools that are always available, each in its **own isolated environment**
+- Only the exposed executables land on your `PATH` — no dependency clashes between tools
+     - Could have a pyroot640 and pyroot642 installed at the same time, for example
+
+```
+~> pixi global install root --with ipython
+~> pixi global expose add --environment root pyroot=ipython
+✔ Exposed executable pyroot from environment root.
+
+~> which pyroot
+/Users/cburr/.pixi/bin/pyroot          # just a wrapper on PATH
+
+~> pyroot
+IPython 9.14.1 -- An enhanced Interactive Python.
+In [1]: import ROOT     # just works ✨
+```
+
+---
+
+# pixi exec
+
+- Run a command in a **throwaway environment** — nothing is installed
+- Pixi fetches what's needed, runs it, then it's gone — ideal for one-offs & CI
+
+```
+~> pixi exec root -l -b -q -e '1+1'
+(int) 2
+```
+
+---
+
+# Multiple channels
+
+- There is prescient for using multiple conda channels together
+- Most significant ones use conda-forge as a base:
+     - [Bioconda](https://bioconda.github.io/) for bioinformatics software
+     - [RoboStack](https://robostack.github.io/) for obotics software
+     - [Emscripten Forge](https://emscripten-forge.org/) for the `emscripten-wasm32` platform
+- For HEP I think it's better to work within conda-forge
+     - Get a lot of benefits from the shared infrastructure
+     - Avoids overlap with multi-purpose software (ROOT, Geant4, ...)
+- I think it can make sense to have smaller channels for niche software
+     - LHCb will likely end up with a channel for their physics stack, for example
+
+---
+
+# RattlerFS: What is the problem?
+
+- The main trade off for conda is disk space and IO usage
+  - No different from containers in that regard
+  - Pixi tries to be smart with reflinking/hardlinks, laziness, etc.
+- It's fine on a local NVMe drive (e.g. your laptop)
+  - On hard drives it's not ideal but manageable
+  - On AFS it's almost unusable
+  - Having it in every grid job would be a disaster (there is a reason we have CVMFS!)
+
+---
+
+# RattlerFS Primer 1: What does "install" mean?
+
+- What does "installing a conda package" mean?
+  1. Download and extract the package to the local cache
+  2. "Copy" the files to the install location
+  3. Apply any necessary fixes (e.g. shebangs, hard coded paths, python stuff, ...)
+- RattlerFS is a virtual filesystem which implements step 2+3
+  - Proxies data from the local cache to the install location on demand
+  - No need to copy files, no disk usage or IO overhead!
+
+---
+
+# RattlerFS Primer 2: One step further with CVMFS
+
+> Download and extract the package to the local cache
+
+- We already have a tool for that: CVMFS!
+- Cache all conda-forge packages on CVMFS
+  - RattlerFS can proxy them to the install location on demand:
+
+
+```bash
+$ ls /cvmfs/conda-cache.cern.ch/prototype-v2/*
+linux-64/  noarch/  osx-arm64/
+```
+
+---
+
+# RattlerFS: Status
+
+- This works on Linux/macOS/Windows using FUSE/NFS/ProjFS<sup>*</sup>
+- The upstream package that provides conda tooling (`rattler`) is interested
+- "Just" need to open the (large) pull request...
+
+<div class="footnotes">
+  <div class="footnote">* Not all backends work on all operating systems</div>
+</div>

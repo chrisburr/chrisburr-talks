@@ -448,6 +448,22 @@ section .overlay.tl, section .overlay.bl { left: var(--slide-pad-x); }
 section .overlay.tr, section .overlay.br { right: var(--slide-pad-x); }
 section .overlay.tm, section .overlay.bm { left: 50%; transform: translateX(-50%); }
 
+/* Vertical stack of accent logos pinned to the right (e.g. an "ecosystem"
+   line-up beside a list). Floats like .overlay — never reflows the text. */
+section .logo-stack {
+  position: absolute;
+  right: var(--slide-pad-x);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-6);
+  z-index: 2;
+  pointer-events: none;
+}
+section .logo-stack img { height: 50px; width: auto; object-fit: contain; }
+
 /* ---------- Links: gold, underlined — links ONLY ---------- */
 section a, section .link {
   color: var(--gold);
