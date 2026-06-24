@@ -113,11 +113,16 @@ build & iterate
 
 - Compiler toolchains are now much more mature
     - Originally hard to use outside of conda builds
-    - Now they're very mature and well maintained, including CUDA
+    - Now they're very mature and well maintained, [including CUDA](https://github.com/conda-forge/cuda-feedstock/blob/main/recipe/doc/end_user_compile_guide.md)
 - Tooling is much faster
     - Used to advertise getting ROOT in under 5 minutes
-    - Now it can be ~10 seconds
-- Pixi provides a lot of "user experience" improvements
+    - Now it can be **~10 seconds** 🚀
+
+    ```
+    pixi global install root
+    pixi global expose add --environment root pyroot=python
+    ```
+- [Pixi](https://pixi.prefix.dev/) provides a lot of "user experience" improvements
 
 ---
 
