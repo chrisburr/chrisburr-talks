@@ -370,10 +370,10 @@ In [1]: import ROOT     # just works ✨
 
 # Multiple channels
 
-- There is prescient for using multiple conda channels together
+- There is precedent for using multiple conda channels together
 - Most significant ones use conda-forge as a base:
      - [Bioconda](https://bioconda.github.io/) for bioinformatics software
-     - [RoboStack](https://robostack.github.io/) for obotics software
+     - [RoboStack](https://robostack.github.io/) for robotics software
      - [Emscripten Forge](https://emscripten-forge.org/) for the `emscripten-wasm32` platform
 - For HEP I think it's better to work within conda-forge
      - Get a lot of benefits from the shared infrastructure

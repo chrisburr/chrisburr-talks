@@ -5,7 +5,10 @@
 
   // Allow the raw HTML some layouts use (comparison columns, diagram grid,
   // footnotes, the title-slide blocks).
-  "markdown.marp.html": "all"
+  "markdown.marp.html": "all",
+  "cSpell.words": [
+    "transformationss"
+  ]
 
   // NOTE: the extension has no custom-engine support, so it cannot run
   // scripts/marp-engine.mjs. The generated title slide, kicker and auto-footer

@@ -23,6 +23,11 @@
 //    same place (so nothing reflows): earlier groups dimmed, the current group
 //    full, later groups hidden-but-space-reserved. Author the slide once; the
 //    steps are generated. Theme handles the .is-faded / .is-hidden styling.
+//
+// 5. Overlay cards — `<!-- _class: overlay -->` keeps the base slide content and
+//    layers each following `<!-- overlay -->`-delimited block on top inside a
+//    floating card. One base slide + one extra slide per block (e.g. an abstract
+//    diagram, then concrete examples revealed over it).
 
 import { Marp } from '@marp-team/marp-core'
 
@@ -138,11 +143,43 @@ function buildSteps(slide) {
   return steps.join('\n---\n')
 }
 
-// Expand every build slide in the deck body; pass others through untouched.
+// Expand one `<!-- _class: overlay -->` slide into a base slide plus one extra
+// slide per `<!-- overlay -->`-delimited block. The base content (everything
+// before the first marker) is repeated on every generated slide so it stays
+// frozen in place; each block is then layered on top inside a floating card
+// (white box, brand-purple border) over a faint scrim — see the theme's
+// `.overlay-scrim` / `.overlay-card`. So one base slide showing the abstract
+// case, then a card per concrete example. Returns the slide unchanged when it
+// has no `<!-- overlay -->` markers (nothing to layer).
+function buildOverlay(slide) {
+  const parts = slide.split(/^[ \t]*<!--\s*overlay\s*-->[ \t]*$/m)
+  if (parts.length < 2) return slide
+  const base = parts[0].replace(/\s+$/, '')
+  const cards = parts.slice(1).map((c) => c.trim()).filter(Boolean)
+  if (!cards.length) return slide
+  // Each step ends with a trailing newline so that joining with `\n---\n` (here
+  // and in the outer expander) leaves a blank line before the `---` — otherwise
+  // it gets absorbed as raw text trailing the preceding `</div>` HTML block and
+  // the slide never splits. (Same reason buildSteps keeps its trailing `\n`.)
+  const steps = [`${base}\n`]
+  for (const card of cards) {
+    steps.push(
+      `${base}\n\n<div class="overlay-scrim">\n<div class="overlay-card">\n\n${card}\n\n</div>\n</div>\n`,
+    )
+  }
+  return steps.join('\n---\n')
+}
+
+// Expand every generated slide in the deck body (build reveals + overlay cards);
+// pass others through untouched.
 function expandBuildSlides(body) {
   return body
     .split(/^---\s*$/m)
-    .map((slide) => (/_class\s*:\s*build\b/.test(slide) ? buildSteps(slide) : slide))
+    .map((slide) => {
+      if (/_class\s*:\s*overlay\b/.test(slide)) return buildOverlay(slide)
+      if (/_class\s*:\s*build\b/.test(slide)) return buildSteps(slide)
+      return slide
+    })
     .join('\n---\n')
 }
 

@@ -464,6 +464,123 @@ section .logo-stack {
 }
 section .logo-stack img { height: 50px; width: auto; object-fit: contain; }
 
+/* ---------- Overlay cards (`<!-- _class: overlay -->` + `<!-- overlay -->`) ----------
+   The engine repeats the base slide and layers each marked block on top inside a
+   floating card. A faint scrim mutes the base so the card reads as "on top"
+   (abstract behind → concrete in front); the card is a white box with the brand
+   purple border. */
+section.overlay .overlay-scrim {
+  position: absolute;
+  inset: var(--header-h) 0 var(--footer-h) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.90);
+  z-index: 4;
+}
+section.overlay .overlay-card {
+  position: relative;
+  z-index: 5;
+  width: min(90%, 1060px);
+  box-sizing: border-box;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  padding: var(--sp-6) var(--sp-7);
+  box-shadow: 0 28px 70px rgba(74, 23, 137, 0.30);
+}
+section.overlay .overlay-card > :first-child { margin-top: 0; }
+section.overlay .overlay-card > :last-child { margin-bottom: 0; }
+section.overlay .overlay-card .ov-title {
+  margin: 0 0 var(--sp-3);
+  text-align: center;
+  font-size: 0.84em;
+  color: var(--ink);
+}
+
+/* In-slide horizontal rule (`<hr>`) — a thin brand-tinted divider between bullet
+   groups (a literal `---` would start a new slide instead). */
+section hr {
+  border: none;
+  border-top: 2px solid var(--rule);
+  width: 100%;
+  margin: var(--sp-4) 0;
+}
+
+/* ---------- Flow diagrams (inline `<svg class="flow">`) ----------
+   A small visual language for the workflow story. COLOUR = IDENTITY: simulate
+   (blue), reconstruct (orange), merge (green), generic payload (purple). Wrap a
+   node in a <g> carrying a c-* class — it sets --c (border/label) and --cf
+   (tint fill); children read those. SHAPE = ROLE: .step / .payload solid box,
+   .job dashed box (a runtime container), .tile a Transformation, .container /
+   .prod the dashed wrappers (Job / Production). */
+section .flow { display: block; width: 100%; height: auto; margin: 0 auto; }
+
+/* identity palette — sets the fill tint (--cf) + line/label colour (--c) */
+section .flow .c-sim    { --c: #2D6CDF; --cf: #E6EEFC; }
+section .flow .c-reco   { --c: #E8810B; --cf: #FCF0E1; }
+section .flow .c-filter { --c: #8B3FA0; --cf: #F1E8F4; }
+section .flow .c-merge  { --c: #1F9D55; --cf: #E4F3EB; }
+section .flow .c-gen    { --c: #4A1789; --cf: #ECE6F4; }
+
+/* nodes */
+section .flow .step, section .flow .payload {
+  fill: var(--cf, #ECE6F4); stroke: var(--c, #4A1789); stroke-width: 2.6;
+  filter: drop-shadow(0 2px 3px rgba(74, 23, 137, 0.16));
+}
+section .flow .tile {
+  fill: var(--cf, #ECE6F4); stroke: var(--c, #4A1789); stroke-width: 2.2;
+  filter: drop-shadow(0 2px 3px rgba(74, 23, 137, 0.16));
+}
+section .flow .job { fill: var(--cf, #ECE6F4); stroke: var(--c, #4A1789); stroke-width: 2.6; stroke-dasharray: 9 5; }
+/* Merged two-step job: two steps (e.g. Reco + Filter) fused into one
+   double-width pill, a colour per step, showing they run inside one job. Each
+   half is a path that shares the inner edge, so the two strokes there double as
+   the divider. .mstep = concrete (solid + shadow); .mjob = abstract protostep
+   (dashed, no shadow), mirroring .step vs .job. */
+section .flow .mfill { fill: var(--cf, #ECE6F4); stroke: var(--c, #4A1789); stroke-width: 2.6; }
+/* Shadow lives on the wrapping group, not the halves, so only the merged
+   pill's outer silhouette casts it — the shared seam stays flat (no inner
+   shadow bleeding onto the other half). */
+section .flow .mstep-grp { filter: drop-shadow(0 2px 3px rgba(74, 23, 137, 0.16)); }
+section .flow .mjob  { fill: var(--cf, #ECE6F4); stroke: var(--c, #4A1789); stroke-width: 2.6; stroke-dasharray: 9 5; }
+section .flow .container { fill: rgba(74, 23, 137, 0.025); stroke: var(--ink); stroke-width: 2.4; stroke-dasharray: 9 6; }
+section .flow .prod { fill: rgba(74, 23, 137, 0.02); stroke: var(--ink); stroke-width: 2.6; stroke-dasharray: 8 7; }
+section .flow .box-lbl { font-family: var(--font-sans); font-weight: 700; font-size: 20px; fill: var(--c, #4A1789); text-anchor: middle; }
+section .flow .step-hdr { font-family: var(--font-sans); font-weight: 700; font-size: 12px; fill: var(--c, #4A1789); text-anchor: middle; opacity: 0.7; }
+
+/* connectors */
+section .flow .ln { stroke: var(--ink-soft); stroke-width: 3; fill: none; stroke-linecap: round; }
+section .flow .ln.dash { stroke-dasharray: 7 6; }
+
+/* data pills + text labels */
+section .flow .pill { fill: #F4F1FA; stroke: rgba(74, 23, 137, 0.30); stroke-width: 1.5; }
+section .flow .pill-lbl { font-family: var(--font-sans); font-size: 17px; fill: var(--ink); text-anchor: middle; }
+section .flow .node { font-family: var(--font-sans); font-size: 17px; fill: var(--ink); }
+section .flow .lbl { font-family: var(--font-mono); font-size: 13px; fill: var(--muted); }
+section .flow .job-lbl { font-family: var(--font-mono); font-size: 12px; font-weight: 700; fill: var(--ink); letter-spacing: 0.08em; }
+section .flow .prod-lbl { font-family: var(--font-mono); font-size: 14px; font-weight: 700; fill: var(--ink); letter-spacing: 0.12em; }
+
+/* transformation tiles + job-dot clusters */
+section .flow .corner { fill: var(--c, #4A1789); }
+section .flow .tname { font-family: var(--font-sans); font-weight: 700; font-size: 24px; fill: var(--c, #4A1789); text-anchor: middle; }
+section .flow .tsub { font-family: var(--font-sans); font-size: 14px; fill: var(--muted); text-anchor: middle; }
+section .flow .count { font-family: var(--font-sans); font-style: italic; font-size: 14px; fill: var(--muted); text-anchor: middle; }
+section .flow .dot { fill: var(--c, #6A3FA8); }
+
+/* Transformation grouping box — a solid translucent frame drawn behind the
+   steps it owns, with a centred heading in the band above them. */
+section .flow .tgroup     { fill: rgba(74, 23, 137, 0.03); stroke: var(--ink-soft); stroke-width: 2; }
+section .flow .tgroup-lbl { font-family: var(--font-sans); font-weight: 700; font-size: 16px; fill: var(--ink-soft); text-anchor: middle; }
+/* Input plugin + metadata-query store feeding a transformation (teal accent). */
+section .flow .plugin     { fill: #E6F4F2; stroke: #138D8D; stroke-width: 2.2; }
+section .flow .plugin-lbl { font-family: var(--font-sans); font-weight: 700; font-size: 15px; fill: #0F7A7A; text-anchor: middle; }
+/* Per-input annotation above an input arrow: each input (one arrow) is fetched
+   by a metadata query and supplied through an input plugin. */
+section .flow .io-sed { font-family: var(--font-sans); font-size: 13px; fill: #0F7A7A; text-anchor: middle; }
+section .flow .io-lbl { font-family: var(--font-sans); font-size: 13px; fill: #0F7A7A; text-anchor: middle; }
+section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3D9A9A; text-anchor: middle; }
+
 /* ---------- Links: gold, underlined — links ONLY ---------- */
 section a, section .link {
   color: var(--gold);
