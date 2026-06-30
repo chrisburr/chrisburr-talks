@@ -6,8 +6,8 @@ title: "DiracX production system"
 subtitle: ""
 author: "Chris Burr"
 affiliation: "CERN"
-event: ""
-event_url: ""
+event: "DiracX hackathon"
+event_url: "https://indico.cern.ch/event/1668629/"
 date: "2026-07-01"
 description: ""
 ---
@@ -31,7 +31,11 @@ description: ""
 - The underpinnings are almost identical to the DIRAC Transformation System.
     - With lots of little tweaks based on experience and lessons learned.
 
-<!-- Show DIRAC and DiracX logos -->
+<div style="display: flex; align-items: center; justify-content: center; gap: 60px; margin-top: var(--sp-7);">
+  <img src="assets/dirac-logo.png" alt="DIRAC — the interware" style="height: 110px; width: auto;">
+  <span style="font-family: var(--font-sans); font-weight: 700; font-size: 52px; color: var(--ink-soft); line-height: 1;">➜</span>
+  <img src="assets/diracx-logo-square.svg" alt="DiracX" style="height: 150px; width: auto;">
+</div>
 
 ---
 
@@ -537,7 +541,56 @@ description: ""
 - Periodically uses the **input plugin** to decide when to create a **task**
 - One or more **transformation input(s)** are assigned to a **task**
 
-<!-- Some kind of visualisation of this -->
+<svg class="flow" style="max-width: 760px" viewBox="0 0 900 352" role="img" aria-label="The transformation-input box is split into unassigned, assigned and done sections; the input plugin assigns LFN3 and LFN6 are unassigned, the five assigned LFNs are grouped into three tasks, nothing is done yet">
+  <defs>
+    <marker id="ahD" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#6A3FA8"/></marker>
+  </defs>
+  <text class="tsub" x="120" y="16">Transformation input</text>
+  <rect class="container" x="14" y="24" width="212" height="316" rx="16"/>
+  <text class="job-lbl" x="26" y="44">UNASSIGNED</text>
+  <rect class="pill" x="32" y="52" width="176" height="26" rx="13" style="fill:#F1E8F4;stroke:#8B3FA0"/>
+  <text class="pill-lbl" x="120" y="70" style="fill:#8B3FA0">LFN3</text>
+  <rect class="pill" x="32" y="82" width="176" height="26" rx="13" style="fill:#F8E6F1;stroke:#C0398B"/>
+  <text class="pill-lbl" x="120" y="100" style="fill:#C0398B">LFN6</text>
+  <line x1="14" y1="116" x2="226" y2="116" stroke="#4A1789" stroke-opacity="0.28" stroke-width="1.6"/>
+  <text class="job-lbl" x="26" y="134">ASSIGNED</text>
+  <rect class="pill" x="32" y="140" width="176" height="26" rx="13" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="120" y="158" style="fill:#2D6CDF">LFN1</text>
+  <rect class="pill" x="32" y="170" width="176" height="26" rx="13" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="120" y="188" style="fill:#E8810B">LFN2</text>
+  <rect class="pill" x="32" y="200" width="176" height="26" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="120" y="218" style="fill:#1F9D55">LFN4</text>
+  <rect class="pill" x="32" y="230" width="176" height="26" rx="13" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="120" y="248" style="fill:#138D8D">LFN5</text>
+  <rect class="pill" x="32" y="260" width="176" height="26" rx="13" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="120" y="278" style="fill:#5B53C0">LFN7</text>
+  <line x1="14" y1="294" x2="226" y2="294" stroke="#4A1789" stroke-opacity="0.28" stroke-width="1.6"/>
+  <text class="job-lbl" x="26" y="312">DONE</text>
+  <text class="lbl" x="120" y="330" text-anchor="middle" style="font-style:italic">&#8212; none yet &#8212;</text>
+  <text class="lbl" x="302" y="170" text-anchor="middle">periodically</text>
+  <line class="ln" x1="226" y1="182" x2="376" y2="182" marker-end="url(#ahD)"/>
+  <rect class="plugin" x="378" y="156" width="150" height="52" rx="14"/>
+  <text class="plugin-lbl" x="453" y="188">input plugin</text>
+  <line class="ln" x1="528" y1="182" x2="590" y2="92" marker-end="url(#ahD)"/>
+  <line class="ln" x1="528" y1="182" x2="590" y2="182" marker-end="url(#ahD)"/>
+  <line class="ln" x1="528" y1="182" x2="590" y2="272" marker-end="url(#ahD)"/>
+  <rect class="container" x="600" y="56" width="288" height="72" rx="16"/>
+  <text class="job-lbl" x="620" y="76">TASK 1</text>
+  <rect class="pill" x="620" y="84" width="124" height="32" rx="16" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="682" y="105" style="fill:#2D6CDF">LFN1</text>
+  <rect class="pill" x="752" y="84" width="124" height="32" rx="16" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="814" y="105" style="fill:#1F9D55">LFN4</text>
+  <rect class="container" x="600" y="146" width="288" height="72" rx="16"/>
+  <text class="job-lbl" x="620" y="166">TASK 2</text>
+  <rect class="pill" x="620" y="174" width="124" height="32" rx="16" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="682" y="195" style="fill:#E8810B">LFN2</text>
+  <rect class="pill" x="752" y="174" width="124" height="32" rx="16" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="814" y="195" style="fill:#138D8D">LFN5</text>
+  <rect class="container" x="600" y="236" width="288" height="72" rx="16"/>
+  <text class="job-lbl" x="620" y="256">TASK 3</text>
+  <rect class="pill" x="620" y="264" width="124" height="32" rx="16" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="682" y="285" style="fill:#5B53C0">LFN7</text>
+</svg>
 
 ---
 
@@ -548,7 +601,173 @@ description: ""
 - Next time the **input plugin** is run, a new **task** might be created
      - Potentially with different inputs
 
-<!-- Some kind of visualisation of this -->
+<svg class="flow" style="max-width: 900px" viewBox="-60 0 1220 392" role="img" aria-label="Each task is submitted as a job; job 1 succeeds so LFN1 and LFN4 move to done, jobs 2 and 3 fail so LFN2, LFN5 and LFN7 return to the unassigned section, leaving nothing assigned">
+  <defs>
+    <marker id="ahE" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#6A3FA8"/></marker>
+    <marker id="ahEr" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#C0392B"/></marker>
+  </defs>
+  <text class="tsub" x="120" y="16">Transformation input</text>
+  <rect class="container" x="14" y="24" width="212" height="316" rx="16"/>
+  <text class="job-lbl" x="26" y="42">UNASSIGNED</text>
+  <rect class="pill" x="32" y="50" width="176" height="26" rx="13" style="fill:#F1E8F4;stroke:#8B3FA0"/>
+  <text class="pill-lbl" x="120" y="68" style="fill:#8B3FA0">LFN3</text>
+  <rect class="pill" x="32" y="80" width="176" height="26" rx="13" style="fill:#F8E6F1;stroke:#C0398B"/>
+  <text class="pill-lbl" x="120" y="98" style="fill:#C0398B">LFN6</text>
+  <rect class="pill" x="32" y="110" width="176" height="26" rx="13" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="120" y="128" style="fill:#E8810B">LFN2</text>
+  <rect class="pill" x="32" y="140" width="176" height="26" rx="13" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="120" y="158" style="fill:#138D8D">LFN5</text>
+  <rect class="pill" x="32" y="170" width="176" height="26" rx="13" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="120" y="188" style="fill:#5B53C0">LFN7</text>
+  <line x1="14" y1="200" x2="226" y2="200" stroke="#4A1789" stroke-opacity="0.28" stroke-width="1.6"/>
+  <text class="job-lbl" x="26" y="218">ASSIGNED</text>
+  <text class="lbl" x="120" y="240" text-anchor="middle" style="font-style:italic">&#8212; none &#8212;</text>
+  <line x1="14" y1="256" x2="226" y2="256" stroke="#4A1789" stroke-opacity="0.28" stroke-width="1.6"/>
+  <text class="job-lbl" x="26" y="274">DONE</text>
+  <rect class="pill" x="32" y="280" width="176" height="26" rx="13" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="120" y="298" style="fill:#2D6CDF">LFN1</text>
+  <rect class="pill" x="32" y="310" width="176" height="26" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="120" y="328" style="fill:#1F9D55">LFN4</text>
+  <line class="ln" x1="226" y1="182" x2="376" y2="182" marker-end="url(#ahE)"/>
+  <rect class="plugin" x="378" y="156" width="150" height="52" rx="14"/>
+  <text class="plugin-lbl" x="453" y="188">input plugin</text>
+  <line class="ln" x1="528" y1="182" x2="590" y2="92" marker-end="url(#ahE)"/>
+  <line class="ln" x1="528" y1="182" x2="590" y2="182" marker-end="url(#ahE)"/>
+  <line class="ln" x1="528" y1="182" x2="590" y2="272" marker-end="url(#ahE)"/>
+  <rect class="container" x="600" y="56" width="250" height="72" rx="16"/>
+  <text class="job-lbl" x="616" y="76">TASK 1</text>
+  <rect class="pill" x="612" y="84" width="110" height="32" rx="16" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="667" y="105" style="fill:#2D6CDF">LFN1</text>
+  <rect class="pill" x="728" y="84" width="110" height="32" rx="16" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="783" y="105" style="fill:#1F9D55">LFN4</text>
+  <rect class="container" x="600" y="146" width="250" height="72" rx="16"/>
+  <text class="job-lbl" x="616" y="166">TASK 2</text>
+  <rect class="pill" x="612" y="174" width="110" height="32" rx="16" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="667" y="195" style="fill:#E8810B">LFN2</text>
+  <rect class="pill" x="728" y="174" width="110" height="32" rx="16" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="783" y="195" style="fill:#138D8D">LFN5</text>
+  <rect class="container" x="600" y="236" width="250" height="72" rx="16"/>
+  <text class="job-lbl" x="616" y="256">TASK 3</text>
+  <rect class="pill" x="612" y="264" width="110" height="32" rx="16" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="667" y="285" style="fill:#5B53C0">LFN7</text>
+  <text class="lbl" x="878" y="80" text-anchor="middle">submit</text>
+  <line class="ln" x1="850" y1="92" x2="918" y2="92" marker-end="url(#ahE)"/>
+  <line class="ln" x1="850" y1="182" x2="918" y2="182" marker-end="url(#ahE)"/>
+  <line class="ln" x1="850" y1="272" x2="918" y2="272" marker-end="url(#ahE)"/>
+  <rect class="container" x="908" y="40" width="208" height="288" rx="16"/>
+  <text class="job-lbl" x="920" y="60">WORKLOAD BACKEND</text>
+  <rect class="step" x="924" y="70" width="180" height="48" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="box-lbl" x="1014" y="100" style="fill:#1F9D55">JOB 1 &#10003;</text>
+  <rect class="step" x="924" y="160" width="180" height="48" rx="13" style="fill:#FBEAE8;stroke:#C0392B"/>
+  <text class="box-lbl" x="1014" y="190" style="fill:#C0392B">JOB 2 &#10007;</text>
+  <rect class="step" x="924" y="250" width="180" height="48" rx="13" style="fill:#FBEAE8;stroke:#C0392B"/>
+  <text class="box-lbl" x="1014" y="280" style="fill:#C0392B">JOB 3 &#10007;</text>
+  <path class="ln dash" style="stroke:#C0392B" d="M1104 184 L1142 184 L1142 372 L-34 372 L-34 112 L12 112" marker-end="url(#ahEr)"/>
+  <path class="ln dash" style="stroke:#C0392B" d="M1104 274 L1142 274 L1142 372"/>
+  <text class="lbl" x="554" y="366" text-anchor="middle" style="fill:#C0392B">failed &#183; inputs returned to unassigned</text>
+</svg>
+
+---
+
+# Grouping correlated inputs
+
+- The **input plugin** inject additional input LFNs
+- For example also include an ancestor file
+
+<svg class="flow" style="max-width: 1000px" viewBox="0 0 980 320" role="img" aria-label="Each transformation-input LFN has a descendant link to its ancestor in a separate Dataset 1; the input plugin reads the transformation input and follows those links to build tasks pairing each file with its ancestor">
+  <defs>
+    <marker id="ahH" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#6A3FA8"/></marker>
+  </defs>
+  <text class="tsub" x="85" y="28">Dataset 1 &#183; ancestors</text>
+  <rect class="container" x="10" y="34" width="150" height="266" rx="14"/>
+  <rect class="pill" x="22" y="44" width="126" height="26" rx="13" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="85" y="63" style="fill:#2D6CDF;font-size:15px">LFN1</text>
+  <rect class="pill" x="22" y="80" width="126" height="26" rx="13" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="85" y="99" style="fill:#E8810B;font-size:15px">LFN2</text>
+  <rect class="pill" x="22" y="116" width="126" height="26" rx="13" style="fill:#F1E8F4;stroke:#8B3FA0"/>
+  <text class="pill-lbl" x="85" y="135" style="fill:#8B3FA0;font-size:15px">LFN3</text>
+  <rect class="pill" x="22" y="152" width="126" height="26" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="85" y="171" style="fill:#1F9D55;font-size:15px">LFN4</text>
+  <rect class="pill" x="22" y="188" width="126" height="26" rx="13" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="85" y="207" style="fill:#138D8D;font-size:15px">LFN5</text>
+  <rect class="pill" x="22" y="224" width="126" height="26" rx="13" style="fill:#F8E6F1;stroke:#C0398B"/>
+  <text class="pill-lbl" x="85" y="243" style="fill:#C0398B;font-size:15px">LFN6</text>
+  <rect class="pill" x="22" y="260" width="126" height="26" rx="13" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="85" y="279" style="fill:#5B53C0;font-size:15px">LFN7</text>
+  <text class="tsub" x="305" y="28">Transformation input</text>
+  <rect class="container" x="230" y="34" width="150" height="266" rx="14"/>
+  <rect class="pill" x="242" y="44" width="126" height="26" rx="13" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="305" y="63" style="fill:#2D6CDF;font-size:15px">LFN:A</text>
+  <rect class="pill" x="242" y="80" width="126" height="26" rx="13" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="305" y="99" style="fill:#E8810B;font-size:15px">LFN:B</text>
+  <rect class="pill" x="242" y="116" width="126" height="26" rx="13" style="fill:#F1E8F4;stroke:#8B3FA0"/>
+  <text class="pill-lbl" x="305" y="135" style="fill:#8B3FA0;font-size:15px">LFN:C</text>
+  <rect class="pill" x="242" y="152" width="126" height="26" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="305" y="171" style="fill:#1F9D55;font-size:15px">LFN:D</text>
+  <rect class="pill" x="242" y="188" width="126" height="26" rx="13" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="305" y="207" style="fill:#138D8D;font-size:15px">LFN:E</text>
+  <rect class="pill" x="242" y="224" width="126" height="26" rx="13" style="fill:#F8E6F1;stroke:#C0398B"/>
+  <text class="pill-lbl" x="305" y="243" style="fill:#C0398B;font-size:15px">LFN:F</text>
+  <rect class="pill" x="242" y="260" width="126" height="26" rx="13" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="305" y="279" style="fill:#5B53C0;font-size:15px">LFN:G</text>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="57" x2="160" y2="57" marker-end="url(#ahH)"/>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="93" x2="160" y2="93" marker-end="url(#ahH)"/>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="129" x2="160" y2="129" marker-end="url(#ahH)"/>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="165" x2="160" y2="165" marker-end="url(#ahH)"/>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="201" x2="160" y2="201" marker-end="url(#ahH)"/>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="237" x2="160" y2="237" marker-end="url(#ahH)"/>
+  <line class="ln" style="stroke-width:2.2" x1="240" y1="273" x2="160" y2="273" marker-end="url(#ahH)"/>
+  <text class="lbl" x="200" y="22" text-anchor="middle">ancestor</text>
+  <line class="ln" x1="380" y1="167" x2="438" y2="167" marker-end="url(#ahH)"/>
+  <rect class="plugin" x="440" y="143" width="130" height="48" rx="14"/>
+  <text class="plugin-lbl" x="505" y="174">input plugin</text>
+  <line class="ln" x1="570" y1="167" x2="628" y2="80" marker-end="url(#ahH)"/>
+  <line class="ln" x1="570" y1="167" x2="628" y2="186" marker-end="url(#ahH)"/>
+  <line class="ln" x1="570" y1="167" x2="628" y2="275" marker-end="url(#ahH)"/>
+  <rect class="container" x="630" y="34" width="300" height="92" rx="16"/>
+  <text class="job-lbl" x="646" y="52">TASK 1</text>
+  <rect class="pill" x="644" y="60" width="130" height="26" rx="13" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="709" y="79" style="fill:#2D6CDF">LFN:A</text>
+  <rect class="pill" x="782" y="60" width="130" height="26" rx="13" style="fill:#E6EEFC;stroke:#2D6CDF"/>
+  <text class="pill-lbl" x="847" y="79" style="fill:#2D6CDF">LFN1</text>
+  <rect class="pill" x="644" y="92" width="130" height="26" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="709" y="111" style="fill:#1F9D55">LFN:D</text>
+  <rect class="pill" x="782" y="92" width="130" height="26" rx="13" style="fill:#E4F3EB;stroke:#1F9D55"/>
+  <text class="pill-lbl" x="847" y="111" style="fill:#1F9D55">LFN4</text>
+  <rect class="container" x="630" y="140" width="300" height="92" rx="16"/>
+  <text class="job-lbl" x="646" y="158">TASK 2</text>
+  <rect class="pill" x="644" y="166" width="130" height="26" rx="13" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="709" y="185" style="fill:#E8810B">LFN:B</text>
+  <rect class="pill" x="782" y="166" width="130" height="26" rx="13" style="fill:#FCF0E1;stroke:#E8810B"/>
+  <text class="pill-lbl" x="847" y="185" style="fill:#E8810B">LFN2</text>
+  <rect class="pill" x="644" y="198" width="130" height="26" rx="13" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="709" y="217" style="fill:#138D8D">LFN:E</text>
+  <rect class="pill" x="782" y="198" width="130" height="26" rx="13" style="fill:#E6F4F2;stroke:#138D8D"/>
+  <text class="pill-lbl" x="847" y="217" style="fill:#138D8D">LFN5</text>
+  <rect class="container" x="630" y="246" width="300" height="58" rx="16"/>
+  <text class="job-lbl" x="646" y="264">TASK 3</text>
+  <rect class="pill" x="644" y="272" width="130" height="26" rx="13" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="709" y="291" style="fill:#5B53C0">LFN:G</text>
+  <rect class="pill" x="782" y="272" width="130" height="26" rx="13" style="fill:#ECEAF8;stroke:#5B53C0"/>
+  <text class="pill-lbl" x="847" y="291" style="fill:#5B53C0">LFN7</text>
+</svg>
+
+---
+
+<!-- _class: build -->
+
+# Data management transformations
+
+- The other side of the transformation system is data management.
+     - Two primitives: **Copy** and **Delete**
+     - Tasks know the final data distribution state you want to obtain
+- Similarities to workload management transformations:
+     - Input metadata query to create tasks
+     - Tasks have input LFNs
+- Differences:
+     - No Jobs (uses Requests instead)
+     - No CWL
+     - No "output"
 
 ---
 
@@ -562,30 +781,51 @@ description: ""
 
 # The three components of the transformation system
 
-<!-- Some kind of diagram showing the three components coming together to make the transformation system -->
+<svg class="flow" style="max-width: 600px" viewBox="0 0 720 540" role="img" aria-label="A Venn diagram: metadata management, data management and the workload backend overlap, and the transformation system sits where all three meet">
+  <g style="fill-opacity: 0.22">
+    <circle cx="360" cy="200" r="165" fill="#8B3FA0" stroke="#8B3FA0" stroke-width="2.5" stroke-opacity="1"/>
+    <circle cx="268" cy="348" r="165" fill="#2D6CDF" stroke="#2D6CDF" stroke-width="2.5" stroke-opacity="1"/>
+    <circle cx="452" cy="348" r="165" fill="#1F9D55" stroke="#1F9D55" stroke-width="2.5" stroke-opacity="1"/>
+  </g>
+  <text class="box-lbl" x="360" y="108" style="fill:#8B3FA0">Metadata</text>
+  <text class="box-lbl" x="360" y="134" style="fill:#8B3FA0">management</text>
+  <text class="box-lbl" x="205" y="372" style="fill:#2D6CDF">Data</text>
+  <text class="box-lbl" x="205" y="398" style="fill:#2D6CDF">management</text>
+  <text class="box-lbl" x="515" y="372" style="fill:#1F9D55">Workload</text>
+  <text class="box-lbl" x="515" y="398" style="fill:#1F9D55">backend</text>
+  <text class="box-lbl" x="360" y="292" style="fill:#3A1772; stroke:#fff; stroke-width:4px; paint-order:stroke">Transformation</text>
+  <text class="box-lbl" x="360" y="318" style="fill:#3A1772; stroke:#fff; stroke-width:4px; paint-order:stroke">system</text>
+</svg>
 
 
 ---
 
 # Metadata management
 
+- Extremely experiment specific
+
 - Basics:
      - Steers what LFNs are picked up by a transformation<sup>†</sup>
      - Output of transformations are registered
-     
+
 - Can also provide:
      - ancestry information for correlated input
      - descendent information for additional safety checks
 
-<!-- Overlay showing the RDST workflow where we have a "Filtering" payload where the input arrow is reconstruction and there is a correlated input for the raw file that is some how queried from the metadata catalog by an advanced input plugin. It should be clear that this payload is a dashed line within a box which represents a transformation. -->
+<div class="footnotes">
+  <div class="footnote">† LFNs can be added manually for special cases.</div>
+</div>
 
-<!-- Footnote, LFNs can be added manually for special cases -->
 ---
 
 # Data management
 
-- Provides information about LFN availability
-- Example uses by transformation **input plugins**:
+<!-- _class: build -->
+
+- Provides information about
+     - LFN availability
+     - Available storage at sites
+- Example uses of transformation **input plugins**:
      - Group LFNs to all have replicas at the same locations
      - Don't create tasks for LFNs that are at locations with downtime
 
@@ -607,53 +847,80 @@ description: ""
 
 <!-- _class: section -->
 
-# Generalisations
+# Wrapping up
 
 ---
 
-# Input to transformations
+# Putting it all together
 
-
+<svg class="flow" style="max-width: 1000px" viewBox="0 0 1020 446" role="img" aria-label="The whole production: Sim feeds a Reco-Filter step and also forks up to a Removal transformation; Filter fans out to two Merge transformations; Sim and Reco each emit monitoring histograms downward, the Sim ones merging while the Reco ones do not">
+  <defs>
+    <marker id="ahI" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#6A3FA8"/></marker>
+  </defs>
+  <rect class="prod" x="10" y="22" width="1000" height="418" rx="20"/>
+  <text class="prod-lbl" x="28" y="46">PRODUCTION</text>
+  <rect x="300" y="60" width="150" height="46" rx="13" fill="#FBEAE8" stroke="#C0392B" stroke-width="2.6" stroke-dasharray="9 5"/>
+  <text class="box-lbl" x="375" y="89" style="fill:#C0392B">Removal</text>
+  <g class="c-sim">
+    <rect class="job" x="40" y="158" width="120" height="50" rx="13"/>
+    <text class="box-lbl" x="100" y="189">Sim</text>
+  </g>
+  <g class="c-reco">
+    <path class="mjob" d="M375,158 L283,158 Q270,158 270,171 L270,195 Q270,208 283,208 L375,208 Z"/>
+    <text class="box-lbl" x="322" y="189">Reco</text>
+  </g>
+  <g class="c-filter">
+    <path class="mjob" d="M375,158 L467,158 Q480,158 480,171 L480,195 Q480,208 467,208 L375,208 Z"/>
+    <text class="box-lbl" x="427" y="189">Filter</text>
+  </g>
+  <g class="c-merge">
+    <rect class="job" x="640" y="116" width="120" height="50" rx="13"/>
+    <text class="box-lbl" x="700" y="147">Merge</text>
+  </g>
+  <g class="c-merge">
+    <rect class="job" x="640" y="208" width="120" height="50" rx="13"/>
+    <text class="box-lbl" x="700" y="239">Merge</text>
+  </g>
+  <line class="ln" x1="160" y1="183" x2="268" y2="183" marker-end="url(#ahI)"/>
+  <path class="ln" d="M214 183 L214 83 L298 83" marker-end="url(#ahI)"/>
+  <path class="ln" d="M480 178 Q580 178 618 143" marker-end="url(#ahI)"/>
+  <path class="ln" d="M480 188 Q580 188 618 231" marker-end="url(#ahI)"/>
+  <line class="ln" x1="100" y1="208" x2="100" y2="268" marker-end="url(#ahI)"/>
+  <g fill="#6A3FA8">
+    <rect x="82" y="286" width="8" height="14"/>
+    <rect x="92" y="278" width="8" height="22"/>
+    <rect x="102" y="274" width="8" height="26"/>
+    <rect x="112" y="282" width="8" height="18"/>
+  </g>
+  <text class="lbl" x="150" y="290" text-anchor="start">monitoring</text>
+  <line class="ln" x1="100" y1="304" x2="100" y2="344" marker-end="url(#ahI)"/>
+  <g class="c-merge">
+    <rect class="job" x="45" y="346" width="110" height="44" rx="13"/>
+    <text class="box-lbl" x="100" y="374">Merge</text>
+  </g>
+  <line class="ln" x1="322" y1="208" x2="322" y2="268" marker-end="url(#ahI)"/>
+  <g fill="#6A3FA8">
+    <rect x="304" y="286" width="8" height="14"/>
+    <rect x="314" y="278" width="8" height="22"/>
+    <rect x="324" y="274" width="8" height="26"/>
+    <rect x="334" y="282" width="8" height="18"/>
+  </g>
+  <text class="lbl" x="372" y="290" text-anchor="start">monitoring</text>
+  <text class="lbl" x="322" y="324" text-anchor="middle">(no merge)</text>
+</svg>
 
 ---
 
-# Data management transformations
+# Jobs
 
-- The other side of the transformation system is data management.
-- Three primitives: **Copy**, **Delete**, **Destroy**.
-     - Delete removes a replica but NEVER the last replica.
-
-<hr>
-
-- Similarities to workload management transformations:
-     - Input metadata query
-
-<hr>
-
-- Differences:
-     - No jobs (uses requests instead)
-     - No CWL
+- There is also a use case for standalone jobs
+     - Testing production requests
+     - One-off jobs (e.g. the histogram merging)
+- A Workload Transformation **Task** and a **Job** look very similar
+     - Both can be submitted to a workload backend
 
 ---
 
-# Input plugin
+<!-- _class: section -->
 
----
-
-# Testing
-
----
-
-# State transitions
-
----
-
-# Ancestry
-
----
-
-# Submission
-
----
-
-# Execution
+# Questions?
