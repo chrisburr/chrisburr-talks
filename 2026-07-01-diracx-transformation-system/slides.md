@@ -20,7 +20,7 @@ description: ""
      - What a production is?
      - How a production is split into transformations?
      - How to make use of these blocks in your own workflows.
-- After the hackathon, an Architecture Design Review (ADR) will be prepared (~1 week).
+- After the hackathon, an Architecture Design Review (ADR) will be prepared early in summer.
      - Once agreed upon, start development!
 
 ---
@@ -598,6 +598,7 @@ description: ""
 
 - A transformation's **task** is submitted to a backend
 - **Tasks** are not retryable -> added back to the pool of unassigned **transformation input(s)**
+  - An input is only ever successfully processed by one **task**
 - Next time the **input plugin** is run, a new **task** might be created
      - Potentially with different inputs
 
@@ -671,7 +672,7 @@ description: ""
 
 # Grouping correlated inputs
 
-- The **input plugin** inject additional input LFNs
+- The **input plugin** can inject additional inputs
 - For example also include an ancestor file
 
 <svg class="flow" style="max-width: 1000px" viewBox="0 0 980 320" role="img" aria-label="Each transformation-input LFN has a descendant link to its ancestor in a separate Dataset 1; the input plugin reads the transformation input and follows those links to build tasks pairing each file with its ancestor">
@@ -791,7 +792,7 @@ description: ""
   <text class="box-lbl" x="360" y="134" style="fill:#8B3FA0">management</text>
   <text class="box-lbl" x="205" y="372" style="fill:#2D6CDF">Data</text>
   <text class="box-lbl" x="205" y="398" style="fill:#2D6CDF">management</text>
-  <text class="box-lbl" x="515" y="372" style="fill:#1F9D55">Workload</text>
+  <text class="box-lbl" x="515" y="372" style="fill:#1F9D55">Workload/Request</text>
   <text class="box-lbl" x="515" y="398" style="fill:#1F9D55">backend</text>
   <text class="box-lbl" x="360" y="292" style="fill:#3A1772; stroke:#fff; stroke-width:4px; paint-order:stroke">Transformation</text>
   <text class="box-lbl" x="360" y="318" style="fill:#3A1772; stroke:#fff; stroke-width:4px; paint-order:stroke">system</text>
@@ -831,17 +832,20 @@ description: ""
 
 ---
 
-# Workload backend
+<!-- _class: build -->
 
-- Workload backend takes care of actual payload execution
-- Each workload task has:
-     - Matching criteria
-     - Zero or more input LFNs
-     - Zero or more input sandboxes
-     - An associated workflow
-- Workload backend is responsible for:
-     - Scheduling the task to a worker node
-     - Starting the DiracX job wrapper
+# Workload/Request backend
+
+- Workload/Request backend takes care of actual **task** execution
+- For workload transformations:
+  - Each workload task has:
+      - Matching criteria
+      - Zero or more input LFNs and input sandboxes
+      - An associated workflow
+  - Workload backend is responsible for:
+      - Scheduling the task to a worker node
+      - Starting the DiracX job wrapper
+- For data management transformations this is handled by **Requests**
 
 ---
 
@@ -859,6 +863,18 @@ description: ""
   </defs>
   <rect class="prod" x="10" y="22" width="1000" height="418" rx="20"/>
   <text class="prod-lbl" x="28" y="46">PRODUCTION</text>
+  <rect class="tgroup" x="26" y="128" width="148" height="88" rx="14"/>
+  <text class="tgroup-lbl" x="100" y="146">Transformation 1</text>
+  <rect class="tgroup" x="256" y="128" width="238" height="88" rx="14"/>
+  <text class="tgroup-lbl" x="375" y="146">Transformation 2</text>
+  <rect class="tgroup" x="286" y="30" width="178" height="86" rx="14"/>
+  <text class="tgroup-lbl" x="375" y="48">Transformation 3</text>
+  <rect class="tgroup" x="624" y="86" width="152" height="88" rx="14"/>
+  <text class="tgroup-lbl" x="700" y="104">Transformation 4</text>
+  <rect class="tgroup" x="624" y="178" width="152" height="88" rx="14"/>
+  <text class="tgroup-lbl" x="700" y="196">Transformation 5</text>
+  <rect class="tgroup" x="150" y="236" width="134" height="82" rx="14"/>
+  <text class="tgroup-lbl" x="217" y="254">Transformation 6</text>
   <rect x="300" y="60" width="150" height="46" rx="13" fill="#FBEAE8" stroke="#C0392B" stroke-width="2.6" stroke-dasharray="9 5"/>
   <text class="box-lbl" x="375" y="89" style="fill:#C0392B">Removal</text>
   <g class="c-sim">
@@ -892,11 +908,11 @@ description: ""
     <rect x="102" y="274" width="8" height="26"/>
     <rect x="112" y="282" width="8" height="18"/>
   </g>
-  <text class="lbl" x="150" y="290" text-anchor="start">monitoring</text>
-  <line class="ln" x1="100" y1="304" x2="100" y2="344" marker-end="url(#ahI)"/>
+  <text class="lbl" x="100" y="320" text-anchor="middle">monitoring</text>
+  <line class="ln" x1="122" y1="288" x2="162" y2="288" marker-end="url(#ahI)"/>
   <g class="c-merge">
-    <rect class="job" x="45" y="346" width="110" height="44" rx="13"/>
-    <text class="box-lbl" x="100" y="374">Merge</text>
+    <rect class="job" x="164" y="266" width="106" height="44" rx="13"/>
+    <text class="box-lbl" x="217" y="294">Merge</text>
   </g>
   <line class="ln" x1="322" y1="208" x2="322" y2="268" marker-end="url(#ahI)"/>
   <g fill="#6A3FA8">
@@ -907,9 +923,10 @@ description: ""
   </g>
   <text class="lbl" x="372" y="290" text-anchor="start">monitoring</text>
   <text class="lbl" x="322" y="324" text-anchor="middle">(no merge)</text>
+  <text x="560" y="418" text-anchor="middle" style="font-family: var(--font-sans); font-size: 16px; font-style: italic; fill: #4A1789">Transformations 2 &amp; 6 share a custom state transition &#8212; on finishing, all monitoring is merged into a single histogram</text>
 </svg>
 
----
+<!-- ---
 
 # Jobs
 
@@ -917,10 +934,37 @@ description: ""
      - Testing production requests
      - One-off jobs (e.g. the histogram merging)
 - A Workload Transformation **Task** and a **Job** look very similar
-     - Both can be submitted to a workload backend
+     - Both can be submitted to a workload backend -->
 
 ---
 
 <!-- _class: section -->
 
 # Questions?
+
+---
+
+# Glossary
+
+<div class="cols">
+<div>
+
+- **LFN** — Logical File Name; a file reference.
+- **Step** — how to run one program (a CLI tool).
+- **Payload** — the box a step runs: inputs &#8594; outputs.
+- **Job** — one payload execution on a worker node.
+- **Task** — inputs a transformation groups, run as a job.
+- **Input plugin** — when to create tasks, and which LFNs to inject.
+
+</div>
+<div>
+
+- **Transformation** — many tasks doing the same thing over its inputs.
+- **Production** — a workflow of transformations; one submission.
+- **Metadata management** — steers LFN selection; outputs &amp; ancestry.
+- **Data management** — LFN availability &amp; replicas; **Copy** / **Delete**.
+- **Workload backend** — executes payloads; scheduling &amp; job wrapper.
+- **Ancestor / descendant** — file-lineage links for correlated inputs.
+
+</div>
+</div>
