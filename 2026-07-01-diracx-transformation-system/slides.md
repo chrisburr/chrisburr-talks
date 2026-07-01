@@ -991,6 +991,7 @@ samples:
 - Can run tests locally (optional)
 - Prior to submission, a test is ran automatically
   - Communicate back to users informaton in a friendly way
+  - Measure resource requirements
   - Approval rules added automatically for restricted productions
 - When merged the production runs
 
