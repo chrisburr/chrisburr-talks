@@ -938,33 +938,66 @@ description: ""
 
 ---
 
-<!-- _class: section -->
+# Higher level concepts
 
-# Questions?
+- Here I've only talked about the low-level system
+- Examples in LHCb:
+  - "Analysis productions": [CHEP-2026](https://indico.cern.ch/event/1471803/contributions/6970826/)
+  - "mc-requests" and "LbMCSubmit": [CHEP-2023](https://indico.jlab.org/event/459/contributions/11555/) and [CHEP-2024](https://indico.cern.ch/event/1338689/contributions/6010990/)
+  - Fluka simulations: [FLUKA.CERN collaboration meeting](https://indico.cern.ch/event/1696556/#41-fluka-on-the-grid)
 
 ---
 
-# Glossary
+# "Analysis Productions" model: Declaring workflows
 
 <div class="cols">
 <div>
 
-- **LFN** — Logical File Name; a file reference.
-- **Step** — how to run one program (a CLI tool).
-- **Payload** — the box a step runs: inputs &#8594; outputs.
-- **Job** — one payload execution on a worker node.
-- **Task** — inputs a transformation groups, run as a job.
-- **Input plugin** — when to create tasks, and which LFNs to inject.
+- The idea is to have a high-level declarative way of declaring any workflow
+- With a escape hatch to allow for deeper customization
+- Or just write a DIRAC workflow directly (mostly for expert users)
 
 </div>
-<div>
+<div style="--fs-code: 18px">
 
-- **Transformation** — many tasks doing the same thing over its inputs.
-- **Production** — a workflow of transformations; one submission.
-- **Metadata management** — steers LFN selection; outputs &amp; ancestry.
-- **Data management** — LFN availability &amp; replicas; **Copy** / **Delete**.
-- **Workload backend** — executes payloads; scheduling &amp; job wrapper.
-- **Ancestor / descendant** — file-lineage links for correlated inputs.
+```yaml
+sim-version: 09
+name: My Analysis
+WG: Charm
+samples:
+  - event-types:
+      - 23103006
+      - 27165175
+      - 30000000
+    data-types:
+      - 2016
+      - 2017
+      - 2018
+    num-events: 2_500_000
+    fast-mc:
+      redecay: yes
+```
 
 </div>
 </div>
+
+---
+
+<!-- _class: build -->
+
+# "Analysis Productions" model: Submission
+
+- Submission is then Git-style CI/CD driven
+- Can run tests locally (optional)
+- Prior to submission, a test is ran automatically
+  - Communicate back to users informaton in a friendly way
+  - Approval rules added automatically for restricted productions
+- When merged the production runs
+
+## We won't have time for this now, at the next workshop...
+
+---
+
+<!-- _class: section -->
+
+# Questions?
