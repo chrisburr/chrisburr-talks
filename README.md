@@ -16,6 +16,7 @@ scripts/
   new_presentation.py scaffold a new deck
 YYYY-MM-DD-name/
   slides.md           one deck (front-matter + slides)
+  README.md           generic per-deck landing page (scaffolded; linked from the site)
   assets/             deck-local images (+ copied logos for the title slide)
 reference/            the source design system (not built or deployed)
 ```
