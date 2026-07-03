@@ -18,16 +18,17 @@
 //    Skipped if `footer:` is set explicitly; per-slide `_footer: ""`
 //    (e.g. the title slide) still wins.
 //
-// 4. Progressive reveal — `<!-- _class: build -->` on a bulleted slide expands
-//    it into one slide per top-level bullet. Each step shows all groups in the
-//    same place (so nothing reflows): earlier groups dimmed, the current group
-//    full, later groups hidden-but-space-reserved. Author the slide once; the
-//    steps are generated. Theme handles the .is-faded / .is-hidden styling.
-//
-// 5. Overlay cards — `<!-- _class: overlay -->` keeps the base slide content and
-//    layers each following `<!-- overlay -->`-delimited block on top inside a
-//    floating card. One base slide + one extra slide per block (e.g. an abstract
-//    diagram, then concrete examples revealed over it).
+// 4. Staged reveal — `<!-- _class: build -->` expands a slide into one step per
+//    stage over a frozen base. Stages are `<!-- step -->` blocks, or top-level
+//    bullets when there are no markers. Two presentations, one grammar:
+//      • default              — each stage revealed in-flow: earlier dimmed,
+//                               current full, later hidden-but-space-reserved so
+//                               nothing reflows.
+//      • `_class: build card` — each stage layered on the base inside a floating
+//                               card over a scrim (abstract behind → concrete in
+//                               front).
+//    Author the slide once; the steps are generated. The theme handles the
+//    .reveal-group/.is-faded/.is-hidden and .reveal-card/.reveal-scrim styling.
 
 import { Marp } from '@marp-team/marp-core'
 
@@ -103,38 +104,51 @@ function buildTitleSlide(fm) {
   ].join('\n')
 }
 
-// Expand one `<!-- _class: build -->` slide into N progressive-reveal steps,
-// one per top-level bullet. Every step renders ALL groups (so layout is frozen);
-// only their reveal state differs. Returns the slide unchanged if it has fewer
-// than two top-level bullets (nothing to reveal incrementally).
-function buildSteps(slide) {
+// Split a `<!-- _class: build -->` slide into { preamble, stages }. Stages are
+// the reveal units; the preamble is the frozen content before the first one.
+// Prefers explicit `<!-- step -->` markers; falls back to top-level bullets so a
+// plain bulleted build slide still splits one bullet at a time. Returns null
+// when there is nothing to split into stages.
+function splitStages(slide) {
+  const markerRe = /^[ \t]*<!--\s*step\s*-->[ \t]*$/m
+  if (markerRe.test(slide)) {
+    const parts = slide.split(markerRe)
+    const preamble = parts[0].replace(/\s+$/, '')
+    const stages = parts.slice(1).map((s) => s.trim()).filter(Boolean)
+    return stages.length ? { preamble, stages } : null
+  }
+
+  // Bullet fallback: each top-level bullet / `1.` number / `##`+ heading (at
+  // column 0) starts a stage running to the next one (or the end of the slide).
   const lines = slide.split('\n')
-  const isTop = (l) => /^(?:[-*+]|\d+[.)]|#{2,6})\s+/.test(l) // top-level bullet, `1.` number, or `##`+ heading (column 0)
-
+  const isTop = (l) => /^(?:[-*+]|\d+[.)]|#{2,6})\s+/.test(l)
   const first = lines.findIndex(isTop)
-  if (first < 0) return slide
-
-  // Group boundaries: each top-level bullet starts a group that runs to the
-  // next top-level bullet (or the end of the slide).
+  if (first < 0) return null
   const starts = lines.map((l, i) => (isTop(l) ? i : -1)).filter((i) => i >= 0)
-  if (starts.length < 2) return slide
+  if (starts.length < 2) return null
 
   const preamble = lines.slice(0, first).join('\n').replace(/\s+$/, '')
-  const groups = starts.map((s, gi) => {
+  const stages = starts.map((s, gi) => {
     const end = gi + 1 < starts.length ? starts[gi + 1] : lines.length
     const slice = lines.slice(s, end)
-    // Each group renders as its own list, so an ordered list would restart at 1
-    // in every group — renumber the leading marker to the group's position so
-    // the numbers stay 1, 2, 3… across reveal steps. (No-op for `-`/`*`/`+`.)
+    // Each stage renders as its own list, so an ordered list would restart at 1
+    // in every stage — renumber the leading marker to the stage's position so
+    // the numbers stay 1, 2, 3… across steps. (No-op for `-`/`*`/`+`.)
     slice[0] = slice[0].replace(/^(\d+)([.)])/, `${gi + 1}$2`)
     return slice.join('\n').replace(/\s+$/, '')
   })
+  return { preamble, stages }
+}
 
-  const N = groups.length
+// Default presentation: N steps, each rendering EVERY stage in place so the
+// layout is frozen; only reveal state differs — earlier `is-faded`, current
+// full, later `is-hidden` (space reserved, no reflow).
+function revealInFlow({ preamble, stages }) {
+  const N = stages.length
   const steps = []
   for (let step = 1; step <= N; step++) {
-    const blocks = groups.map((g, gi) => {
-      const i = gi + 1 // 1-based group index
+    const blocks = stages.map((g, gi) => {
+      const i = gi + 1 // 1-based stage index
       const state = i < step ? ' is-faded' : i > step ? ' is-hidden' : ''
       return `<div class="reveal-group${state}">\n\n${g}\n\n</div>`
     })
@@ -143,43 +157,39 @@ function buildSteps(slide) {
   return steps.join('\n---\n')
 }
 
-// Expand one `<!-- _class: overlay -->` slide into a base slide plus one extra
-// slide per `<!-- overlay -->`-delimited block. The base content (everything
-// before the first marker) is repeated on every generated slide so it stays
-// frozen in place; each block is then layered on top inside a floating card
-// (white box, brand-purple border) over a faint scrim — see the theme's
-// `.overlay-scrim` / `.overlay-card`. So one base slide showing the abstract
-// case, then a card per concrete example. Returns the slide unchanged when it
-// has no `<!-- overlay -->` markers (nothing to layer).
-function buildOverlay(slide) {
-  const parts = slide.split(/^[ \t]*<!--\s*overlay\s*-->[ \t]*$/m)
-  if (parts.length < 2) return slide
-  const base = parts[0].replace(/\s+$/, '')
-  const cards = parts.slice(1).map((c) => c.trim()).filter(Boolean)
-  if (!cards.length) return slide
+// Card presentation: the frozen base alone, then the base with each stage
+// layered on top inside a floating card over a scrim (theme `.reveal-scrim` /
+// `.reveal-card`). Abstract case behind → one concrete example in front.
+function revealCards({ preamble, stages }) {
   // Each step ends with a trailing newline so that joining with `\n---\n` (here
   // and in the outer expander) leaves a blank line before the `---` — otherwise
   // it gets absorbed as raw text trailing the preceding `</div>` HTML block and
-  // the slide never splits. (Same reason buildSteps keeps its trailing `\n`.)
-  const steps = [`${base}\n`]
-  for (const card of cards) {
+  // the slide never splits.
+  const steps = [`${preamble}\n`]
+  for (const card of stages) {
     steps.push(
-      `${base}\n\n<div class="overlay-scrim">\n<div class="overlay-card">\n\n${card}\n\n</div>\n</div>\n`,
+      `${preamble}\n\n<div class="reveal-scrim">\n<div class="reveal-card">\n\n${card}\n\n</div>\n</div>\n`,
     )
   }
   return steps.join('\n---\n')
 }
 
-// Expand every generated slide in the deck body (build reveals + overlay cards);
-// pass others through untouched.
+// Expand one reveal slide per its presentation. Card mode needs ≥1 stage (base +
+// a card); in-flow needs ≥2 (one stage has nothing to reveal incrementally).
+// Returns the slide unchanged when there aren't enough stages.
+function expandReveal(slide) {
+  const parsed = splitStages(slide)
+  if (!parsed) return slide
+  if (/_class\s*:\s*build\s+card\b/.test(slide)) return revealCards(parsed)
+  return parsed.stages.length >= 2 ? revealInFlow(parsed) : slide
+}
+
+// Expand every `<!-- _class: build -->` slide in the deck body; pass others
+// through untouched.
 function expandBuildSlides(body) {
   return body
     .split(/^---\s*$/m)
-    .map((slide) => {
-      if (/_class\s*:\s*overlay\b/.test(slide)) return buildOverlay(slide)
-      if (/_class\s*:\s*build\b/.test(slide)) return buildSteps(slide)
-      return slide
-    })
+    .map((slide) => (/_class\s*:\s*build\b/.test(slide) ? expandReveal(slide) : slide))
     .join('\n---\n')
 }
 

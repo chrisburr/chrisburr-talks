@@ -129,7 +129,7 @@ build & iterate
 
 - [Pixi](https://pixi.prefix.dev/) provides a lot of "user experience" improvements
 
-<img class="overlay tr" src="assets/pixi.png" alt="Pixi">
+<img class="badge tr" src="assets/pixi.png" alt="Pixi">
 
 ---
 
@@ -137,7 +137,7 @@ build & iterate
 
 <!-- _class: build -->
 
-<img class="overlay tr" src="assets/pixi.png" alt="Pixi">
+<img class="badge tr" src="assets/pixi.png" alt="Pixi">
 
 - Workspace model of working
   - Add a `pixi.toml` Pixi manifest to describe the software you need
@@ -198,7 +198,7 @@ build & iterate
 
 # conda-forge
 
-<img class="overlay tr" src="assets/conda-forge-logo.svg" alt="conda-forge" style="--overlay-h: 80px">
+<img class="badge tr" src="assets/conda-forge-logo.svg" alt="conda-forge" style="--badge-h: 80px">
 
 - Shared CI and distribution infrastructure.
 - ~7800 contributors, 33,000+ packages, 43 billion+ downloads

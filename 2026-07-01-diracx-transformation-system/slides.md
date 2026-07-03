@@ -127,7 +127,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # Start with the basics
 
-<!-- _class: overlay -->
+<!-- _class: build card -->
 
 <div class="cols">
 <div>
@@ -158,9 +158,9 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 </div>
 </div>
 
-<!-- overlay -->
+<!-- step -->
 
-<p class="ov-title"><strong>Simple case:</strong> a simulation and a reconstruction</p>
+<p class="step-title"><strong>Simple case:</strong> a simulation and a reconstruction</p>
 
 <svg class="flow" viewBox="0 0 620 208" role="img" aria-label="A simulation payload produces simulated data with no input; a reconstruction payload turns raw data into reconstructed data">
   <defs>
@@ -186,9 +186,9 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
   <text class="pill-lbl" x="504" y="168">Reconstructed data</text>
 </svg>
 
-<!-- overlay -->
+<!-- step -->
 
-<p class="ov-title"><strong>More complex:</strong> correlated inputs, many outputs</p>
+<p class="step-title"><strong>More complex:</strong> correlated inputs, many outputs</p>
 
 <svg class="flow" viewBox="0 0 630 220" role="img" aria-label="Raw data and reconstructed data go into a payload which produces File A, File B and File C">
   <defs>

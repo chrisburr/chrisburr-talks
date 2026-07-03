@@ -190,7 +190,7 @@ description: ""
 
 <!-- _class: build -->
 
-<img class="overlay tr" src="assets/pixi.png" alt="Pixi">
+<img class="badge tr" src="assets/pixi.png" alt="Pixi">
 
 - Workspace model of working
   - Add a `pixi.toml` to describe the software you need

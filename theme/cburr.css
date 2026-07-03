@@ -398,32 +398,32 @@ section .src {
   text-align: center;
 }
 
-/* ---------- Overlay image (logo / accent) ----------
-   A small image floated over the body as an overlay: absolutely positioned, so
-   it never reflows the surrounding text. Pick a position with a corner
+/* ---------- Badge image (logo / accent) ----------
+   A small image floated over the body as a corner badge: absolutely positioned,
+   so it never reflows the surrounding text. Pick a position with a corner
    modifier — t/b (top/bottom) × l/m/r (left/middle/right):
-     <img class="overlay tr" src="assets/pixi.png" alt="Pixi">
+     <img class="badge tr" src="assets/pixi.png" alt="Pixi">
    Top sits just below the masthead, bottom just above the footer. Resize with
-   an inline height or the --overlay-h custom property. */
-section .overlay {
+   an inline height or the --badge-h custom property. */
+section .badge {
   position: absolute;
-  height: var(--overlay-h, 200px);
+  height: var(--badge-h, 200px);
   width: auto;
   z-index: 2;
   pointer-events: none;
 }
-section .overlay.tl, section .overlay.tm, section .overlay.tr {
+section .badge.tl, section .badge.tm, section .badge.tr {
   top: calc(var(--header-h) + var(--sp-5));
 }
-section .overlay.bl, section .overlay.bm, section .overlay.br {
+section .badge.bl, section .badge.bm, section .badge.br {
   bottom: calc(var(--footer-h) + var(--sp-5));
 }
-section .overlay.tl, section .overlay.bl { left: var(--slide-pad-x); }
-section .overlay.tr, section .overlay.br { right: var(--slide-pad-x); }
-section .overlay.tm, section .overlay.bm { left: 50%; transform: translateX(-50%); }
+section .badge.tl, section .badge.bl { left: var(--slide-pad-x); }
+section .badge.tr, section .badge.br { right: var(--slide-pad-x); }
+section .badge.tm, section .badge.bm { left: 50%; transform: translateX(-50%); }
 
 /* Vertical stack of accent logos pinned to the right (e.g. an "ecosystem"
-   line-up beside a list). Floats like .overlay — never reflows the text. */
+   line-up beside a list). Floats like .badge — never reflows the text. */
 section .logo-stack {
   position: absolute;
   right: var(--slide-pad-x);
@@ -438,12 +438,12 @@ section .logo-stack {
 }
 section .logo-stack img { height: 50px; width: auto; object-fit: contain; }
 
-/* ---------- Overlay cards (`<!-- _class: overlay -->` + `<!-- overlay -->`) ----------
-   The engine repeats the base slide and layers each marked block on top inside a
-   floating card. A faint scrim mutes the base so the card reads as "on top"
-   (abstract behind → concrete in front); the card is a white box with the brand
-   purple border. */
-section.overlay .overlay-scrim {
+/* ---------- Card reveal (`<!-- _class: build card -->` + `<!-- step -->`) ----------
+   The card presentation of a staged reveal: the engine repeats the frozen base
+   slide and layers each `<!-- step -->` block on top inside a floating card. A
+   faint scrim mutes the base so the card reads as "on top" (abstract behind →
+   concrete in front); the card is a white box with the brand purple border. */
+section.build.card .reveal-scrim {
   position: absolute;
   inset: var(--header-h) 0 var(--footer-h) 0;
   display: flex;
@@ -452,7 +452,7 @@ section.overlay .overlay-scrim {
   background: rgba(255, 255, 255, 0.90);
   z-index: 4;
 }
-section.overlay .overlay-card {
+section.build.card .reveal-card {
   position: relative;
   z-index: 5;
   width: min(90%, 1060px);
@@ -463,9 +463,9 @@ section.overlay .overlay-card {
   padding: var(--sp-6) var(--sp-7);
   box-shadow: 0 28px 70px rgba(74, 23, 137, 0.30);
 }
-section.overlay .overlay-card > :first-child { margin-top: 0; }
-section.overlay .overlay-card > :last-child { margin-bottom: 0; }
-section.overlay .overlay-card .ov-title {
+section.build.card .reveal-card > :first-child { margin-top: 0; }
+section.build.card .reveal-card > :last-child { margin-bottom: 0; }
+section.build.card .reveal-card .step-title {
   margin: 0 0 var(--sp-3);
   text-align: center;
   font-size: 0.84em;
@@ -579,11 +579,12 @@ section .fineprint > :first-child { margin-top: 0; }
 section .fineprint li,
 section .fineprint li::before { color: var(--muted); }
 
-/* ---------- Progressive reveal (<!-- _class: build -->) ----------
-   The engine splits a build slide into one step per top-level bullet, wrapping
-   each group in `.reveal-group`. Every step renders all groups in the same
-   place; only their state changes — earlier groups dimmed, later groups hidden
-   but still occupying space, so nothing reflows between steps. */
+/* ---------- In-flow reveal (<!-- _class: build -->) ----------
+   The default presentation of a staged reveal. The engine splits a build slide
+   into one step per stage — a `<!-- step -->` block, or a top-level bullet when
+   there are no markers — wrapping each stage in `.reveal-group`. Every step
+   renders all groups in the same place; only their state changes — earlier
+   groups dimmed, later hidden but still occupying space, so nothing reflows. */
 section .reveal-group { margin: 0 0 var(--sp-4); }
 section .reveal-group:last-child { margin-bottom: 0; }
 section .reveal-group > ul,
