@@ -9,7 +9,7 @@ affiliation: "CERN"
 event: "DIRAC Users' Workshop 2026"
 event_url: ""
 date: "2026-10-12"
-description: "Monday session: the Transformation System ADRs, where they lead (Analysis Productions for everyone), and the questions we want the workshop to answer."
+description: "Monday session: the approved Transformation System ADRs, where they lead (Analysis Productions for everyone), and the questions for building on them."
 ---
 
 <!-- Deck-local styling, copied from 2026-07-01-diracx-transformation-system so
@@ -144,7 +144,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 ---
 
-# The ADRs under review this week
+# The approved ADRs
 
 | ADR | What it fixes |
 | --- | --- |
@@ -157,7 +157,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 | DX-ADR-008 / 009 | Data transformations, journalled counters |
 
 <div class="footnotes">
-  <div class="footnote">Plus DX-ADR-001 (tasks), which everything above runs on. The review concludes at this workshop.</div>
+  <div class="footnote">Plus DX-ADR-001 (tasks), which everything above runs on.</div>
 </div>
 
 <!-- TODO(Chris): confirm the docs-site URL pattern for the ADR pages once PR 1042 is merged. -->
@@ -557,9 +557,9 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # How this part works
 
-- Each question has the **current proposal**, and the **ADR** your answer changes
-- Answers change the ADRs this week, or become issues for the Transformation System track
-- Anything bigger seeds a birds-of-a-feather session
+- The design is settled: each question starts from **what the ADR decided**
+- What we need is how your community fits onto it: your extensions, your configuration, your priorities
+- Answers become issues for the Transformation System track; anything bigger seeds a birds-of-a-feather session
 
 <div class="footnotes">
   <div class="footnote">Data management, Rucio and the future of pilots have their own sessions on Tuesday.</div>
@@ -569,8 +569,8 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # 1 · What is an input for you?
 
-- **Proposal:** usually a file (LFN); possibly part of one (a lumi section); possibly not a file (a seed, a parameter set)
-- **Question:** what are your units of work? Does any of your work have **no inputs at all**, not even seeds?
+- **Decided:** usually a file (LFN); possibly part of one (a lumi section); possibly not a file (a seed, a parameter set)
+- **Question:** which of these are your units of work, and which feeder would produce them? Does any of your work have **no inputs at all**, not even seeds?
 
 <div class="footnotes">
   <div class="footnote">DX-ADR-004, DX-ADR-005</div>
@@ -580,8 +580,8 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # 2 · When an input fails, what should happen?
 
-- **Proposal:** `HandleFailedInput` decides per input: retry, split into smaller pieces, or quarantine for an operator
-- **Question:** what does your community do today? Who decides, and on what information?
+- **Decided:** `HandleFailedInput` decides per input: retry, split into smaller pieces, or quarantine for an operator
+- **Question:** what should your `HandleFailedInput` do? Who decides, and on what information?
 
 <div class="footnotes">
   <div class="footnote">DX-ADR-005, DX-ADR-006</div>
@@ -591,8 +591,8 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # 3 · What do you need to see before approving?
 
-- **Proposal:** optional scouting on a reduced sample, then ordered approving actions
-- **Question:** do you test before running at scale? What must pass before a person signs off?
+- **Decided:** optional scouting on a reduced sample, then ordered approving actions
+- **Question:** which approving actions does your community need? What must pass before a person signs off?
 
 <div class="footnotes">
   <div class="footnote">DX-ADR-005, DX-ADR-006</div>
@@ -602,7 +602,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # 4 · How will your users submit work?
 
-- **Proposal:** everything is CWL underneath; nothing yet on what users see in front of it
+- **Decided:** everything is CWL underneath; what users see in front of it is open
 - **Question:** will your users write CWL directly, or through a higher-level tool like Analysis Productions or LbMCSubmit?
 
 <div class="footnotes">
@@ -613,7 +613,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # 5 · What drives your feeders?
 
-- **Proposal:** a feeder evaluates a query against your catalogue and inserts new inputs
+- **Decided:** a feeder evaluates a query against your catalogue and inserts new inputs
 - **Question:** what is your catalogue (DFC metadata, a bookkeeping, DBS, Rucio DIDs)? Can the same file reach a transformation from two feeders?
 
 <div class="footnotes">
@@ -622,10 +622,10 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 ---
 
-# 6 · Is the migration path acceptable?
+# 6 · How fast can you move off DIRAC?
 
-- **Proposal:** start with everything on `legacy-dirac`, then shift a growing fraction of parcels to native backends
-- **Question:** would you run this in production? What would make you raise the fraction?
+- **Decided:** start with everything on `legacy-dirac`, then shift a growing fraction of parcels to native backends
+- **Question:** what would you need to see before raising the fraction? What should we build first to get you there?
 
 <div class="footnotes">
   <div class="footnote">DX-ADR-003</div>
@@ -635,7 +635,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # 7 · Should plugins be pinned?
 
-- **Proposal:** feeders, packers and hooks are plain functions discovered through entry points
+- **Decided:** feeders, packers and hooks are plain functions discovered through entry points
 - **Question:** should a running transformation keep the plugin versions it started with, even after an upgrade?
 
 <div class="footnotes">
@@ -646,7 +646,7 @@ section .flow .io-sub { font-family: var(--font-sans); font-size: 13px; fill: #3
 
 # What happens next
 
-- Answers from today go into the ADRs before the review closes
+- Answers from today shape the development plan and the first extensions
 - The **Transformation System track** turns the ADRs into a development plan and starts on the first tasks
 - The **CWL track** writes and runs real workgraphs with the `dirac:` hints
 - Everything is on the docs site, including the [playground](https://diracx.diracgrid.org/playground/)
