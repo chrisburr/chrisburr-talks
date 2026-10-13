@@ -3,8 +3,10 @@
 
 Finds each immediate subdirectory containing a `slides.md` (excluding
 reference/, scripts/, theme/, node_modules/ and dotted dirs) and runs
-marp-cli twice per deck: once for HTML, once for PDF. Outputs sit
-alongside the source slides.md. Invoked by `pixi run build`.
+marp-cli twice per deck: once for HTML (`slides.html`), once for PDF
+(`<deck>.pdf`, so a download is named after the talk). Outputs sit alongside
+the source slides.md; the deck's `index.html` is the talk page written by
+build_index.py. Invoked by `pixi run build`.
 """
 from __future__ import annotations
 
@@ -57,10 +59,10 @@ def main() -> int:
     failures = []
     for deck in decks:
         src = str((deck / "slides.md").relative_to(ROOT))
-        # Build the deck to index.html so the bare directory URL (…/deck/)
-        # serves it on GitHub Pages; the PDF stays slides.pdf.
-        html = str((deck / "index.html").relative_to(ROOT))
-        pdf = str((deck / "slides.pdf").relative_to(ROOT))
+        # The bare directory URL (…/deck/) serves the talk page (index.html,
+        # from build_index.py); the slides themselves live in slides.html.
+        html = str((deck / "slides.html").relative_to(ROOT))
+        pdf = str((deck / f"{deck.name}.pdf").relative_to(ROOT))
         print(f"==> {deck.name}")
         try:
             run([*marp, src, *COMMON, "-o", html])

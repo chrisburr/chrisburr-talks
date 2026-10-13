@@ -7,8 +7,9 @@ deck written in Markdown and built with [Marp](https://marp.app/).
 
 ## View the talk
 
-- **Slides:** <https://chrisburr.github.io/chrisburr-talks/2026-06-24-hsf-conda-forge/>
-- **PDF:** <https://chrisburr.github.io/chrisburr-talks/2026-06-24-hsf-conda-forge/slides.pdf>
+- **Talk page:** <https://chrisburr.github.io/chrisburr-talks/2026-06-24-hsf-conda-forge/>
+- **Slides:** <https://chrisburr.github.io/chrisburr-talks/2026-06-24-hsf-conda-forge/slides.html>
+- **PDF:** <https://chrisburr.github.io/chrisburr-talks/2026-06-24-hsf-conda-forge/2026-06-24-hsf-conda-forge.pdf>
 - **Event page:** <https://indico.cern.ch/event/1692605/>
 - **All talks:** <https://chrisburr.github.io/chrisburr-talks/>
 

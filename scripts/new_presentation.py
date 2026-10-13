@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Scaffold a new presentation folder: NAME/slides.md + NAME/README.md + NAME/assets/.
 
-The README is a generic per-deck landing page (what the talk is, where to view
-it, how to build it) — the index website links straight to each deck's folder.
+The README is a generic per-deck landing page for the GitHub folder (what the
+talk is, where to view it, how to build it).
 
 Usage: python scripts/new_presentation.py 2026-07-01-my-talk
 Invoked by `pixi run new NAME`.
@@ -91,8 +91,8 @@ def repo_slug() -> str | None:
 
 
 def deck_urls(slug: str) -> dict[str, str] | None:
-    """Public URLs for a deck: its rendered page + PDF on GitHub Pages, and the
-    talks index. Derived from the repo slug so this tracks the actual remote."""
+    """Public URLs for a deck: its talk page, slides + PDF on GitHub Pages, and
+    the talks index. Derived from the repo slug so this tracks the actual remote."""
     repo = repo_slug()
     if not repo:
         return None
@@ -101,8 +101,9 @@ def deck_urls(slug: str) -> dict[str, str] | None:
     # A `<owner>.github.io` repo is served at the host root; others under /repo/.
     base = host if name.lower() == f"{owner.lower()}.github.io" else f"{host}/{name}"
     return {
-        "pages": f"{base}/{slug}/",
-        "pdf": f"{base}/{slug}/slides.pdf",
+        "page": f"{base}/{slug}/",
+        "slides": f"{base}/{slug}/slides.html",
+        "pdf": f"{base}/{slug}/{slug}.pdf",
         "index": f"{base}/",
     }
 
@@ -125,7 +126,11 @@ def readme_text(
         "",
     ]
     if urls:
-        out += [f"- **Slides:** <{urls['pages']}>", f"- **PDF:** <{urls['pdf']}>"]
+        out += [
+            f"- **Talk page:** <{urls['page']}>",
+            f"- **Slides:** <{urls['slides']}>",
+            f"- **PDF:** <{urls['pdf']}>",
+        ]
     if event_url:
         out.append(f"- **Event page:** <{event_url}>")
     if urls:
@@ -185,7 +190,7 @@ def main() -> int:
     d = date_from_name(name)
     slides.write_text(TEMPLATE.format(title=title, date=d.isoformat()))
 
-    # A generic README for the folder — the website links people straight here.
+    # A generic README for the folder — the website's Source link lands here.
     # event/event_url are blank in a fresh scaffold; fill them in slides.md.
     readme = folder / "README.md"
     readme.write_text(

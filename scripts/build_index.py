@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Generate index.html listing every built presentation.
+"""Generate index.html listing every built presentation, plus a talk page each.
 
 Walks the immediate subdirectories of the repo root (excluding reference/,
 scripts/, theme/, node_modules/ and dotted dirs), reads the YAML frontmatter
-from each `slides.md` (title, date, description), and writes an index.html
-linking to the built HTML and PDF for each deck, newest first.
+from each `slides.md` (title, date, description, event, ...), and writes an
+index.html with one card per deck, newest first. Each card links to that
+deck's talk page (`<deck>/index.html`, also written here), which shows the
+details, the built slides (`slides.html`) and PDF (`<deck>.pdf`) from build.py.
 
 The landing page has its own look — deliberately *not* the slide theme: the
 cloud-chamber photo fills the viewport and the talks sit in translucent
@@ -72,6 +74,7 @@ def github_base() -> str | None:
 
 
 GITHUB_BASE = github_base()
+CLOUD_CHAMBER = cloud_chamber_uri()
 
 
 def parse_frontmatter(md: Path) -> dict[str, str]:
@@ -143,17 +146,23 @@ def collect() -> list[dict]:
             continue
         fm = parse_frontmatter(md)
         date = coerce_date(fm.get("date", "")) or coerce_date(d.name[:10])
+        # Paths are relative to the deck folder (the talk page lives there);
+        # the landing page prefixes them with the slug.
+        pdf = f"{d.name}.pdf"
         decks.append(
             {
                 "kind": "local",
                 "slug": d.name,
                 "title": fm.get("title") or d.name,
+                "subtitle": fm.get("subtitle", ""),
                 "description": fm.get("description", ""),
+                "author": fm.get("author") or "Chris Burr",
+                "affiliation": fm.get("affiliation") or "CERN",
+                "event": fm.get("event", ""),
                 "date": date,
                 "date_str": date.strftime("%-d %B %Y") if date else "",
-                # Link to the deck directory (served by its index.html) for a clean URL.
-                "html": f"{d.name}/" if (d / "index.html").exists() else None,
-                "pdf": f"{d.name}/slides.pdf" if (d / "slides.pdf").exists() else None,
+                "html": "slides.html" if (d / "slides.html").exists() else None,
+                "pdf": pdf if (d / pdf).exists() else None,
                 "event_url": fm.get("event_url", "").strip(),
             }
         )
@@ -170,15 +179,22 @@ def _event_label(url: str) -> str:
     return "Indico" if "indico." in url else "Event"
 
 
-def render_local(deck: dict, title: str, desc: str, date_str: str) -> str:
+def _buttons(deck: dict, prefix: str = "") -> str:
+    """View slides / PDF buttons, with paths relative to `prefix`."""
     btns = []
     if deck["html"]:
-        btns.append(f'<a class="btn primary" href="{html.escape(deck["html"])}">View&nbsp;slides</a>')
+        href = html.escape(prefix + deck["html"])
+        btns.append(f'<a class="btn primary" href="{href}">View&nbsp;slides</a>')
     if deck["pdf"]:
-        btns.append(f'<a class="btn" href="{html.escape(deck["pdf"])}">PDF</a>')
+        href = html.escape(prefix + deck["pdf"])
+        btns.append(f'<a class="btn" href="{href}" download>PDF</a>')
     if not btns:
         btns.append('<span class="unbuilt">not built yet</span>')
+    return "".join(btns)
 
+
+def _reflinks(deck: dict) -> str:
+    """Secondary Indico / Source links."""
     refs = []
     if deck["event_url"]:
         url = html.escape(deck["event_url"])
@@ -186,13 +202,19 @@ def render_local(deck: dict, title: str, desc: str, date_str: str) -> str:
     if GITHUB_BASE and deck["slug"]:
         src = f'{html.escape(GITHUB_BASE)}/tree/main/{html.escape(deck["slug"])}'
         refs.append(f'<a class="reflink" href="{src}" target="_blank" rel="noopener">Source&nbsp;{ARROW}</a>')
-    refs_html = f'<span class="reflinks">{"".join(refs)}</span>' if refs else ""
+    return f'<span class="reflinks">{"".join(refs)}</span>' if refs else ""
 
+
+def render_local(deck: dict, title: str, desc: str, date_str: str) -> str:
+    # The whole card links to the talk page (stretched overlay); the buttons
+    # and reference links sit above it.
+    prefix = f'{deck["slug"]}/'
     return f"""      <li class="card">
+        <a class="stretched" href="{html.escape(prefix)}" aria-label="{title}"></a>
         <div class="meta">{date_str}</div>
         <h2>{title}</h2>
         {f'<p class="desc">{desc}</p>' if desc else ''}
-        <div class="links">{''.join(btns)}{refs_html}</div>
+        <div class="links">{_buttons(deck, prefix)}{_reflinks(deck)}</div>
       </li>"""
 
 
@@ -205,7 +227,7 @@ def render_external(deck: dict, title: str, desc: str, date_str: str) -> str:
     # A direct PDF in addition to the event page rides above the card overlay.
     extra = ""
     if deck["pdf"] and deck["event_url"]:
-        extra = (f'<div class="links"><a class="reflink ontop" href="{html.escape(deck["pdf"])}" '
+        extra = (f'<div class="links"><a class="reflink" href="{html.escape(deck["pdf"])}" '
                  f'target="_blank" rel="noopener">PDF&nbsp;{ARROW}</a></div>')
     return f"""      <li class="card external">
         <a class="stretched" href="{html.escape(primary)}" target="_blank" rel="noopener" aria-label="{title} (opens externally)"></a>
@@ -217,26 +239,9 @@ def render_external(deck: dict, title: str, desc: str, date_str: str) -> str:
       </li>"""
 
 
-def render(decks: list[dict]) -> str:
-    cards = []
-    for deck in decks:
-        title = html.escape(deck["title"])
-        desc = html.escape(deck["description"])
-        date_str = html.escape(deck["date_str"]).upper()
-        if deck["kind"] == "external":
-            cards.append(render_external(deck, title, desc, date_str))
-        else:
-            cards.append(render_local(deck, title, desc, date_str))
-    body = "\n".join(cards) if cards else '      <li class="card empty">No presentations built yet.</li>'
-    count = f"{len(decks)} talk{'s' if len(decks) != 1 else ''}"
-
-    return f"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Talks &middot; Chris Burr</title>
-<style>
+def base_css() -> str:
+    """Styles shared by the landing page and the talk pages."""
+    return f"""
   * {{ box-sizing: border-box; }}
   html, body {{ margin: 0; }}
   body {{
@@ -255,54 +260,31 @@ def render(decks: list[dict]) -> str:
     z-index: -1;
     background:
       linear-gradient(180deg, rgba(20,10,45,0.55), rgba(20,10,45,0.68)),
-      url("{cloud_chamber_uri()}") center / cover no-repeat;
+      url("{CLOUD_CHAMBER}") center / cover no-repeat;
   }}
   .wrap {{ max-width: 840px; margin: 0 auto; padding: 7vh 24px 64px; }}
 
-  /* Header — its own frosted panel */
-  .masthead {{
-    backdrop-filter: blur(16px) saturate(130%);
-    -webkit-backdrop-filter: blur(16px) saturate(130%);
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.22);
-    border-radius: 20px;
-    padding: 30px 34px;
-    margin-bottom: 28px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-  }}
-  .masthead h1 {{ margin: 0; font-size: clamp(34px, 6vw, 52px); font-weight: 800; letter-spacing: -0.02em; }}
-  .masthead p {{
-    margin: 8px 0 0; font-size: 16px; letter-spacing: 0.04em;
-    text-transform: uppercase; color: rgba(243,240,251,0.78);
-    font-family: {FONT_MONO};
-  }}
-
-  ul.decks {{ list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }}
-
-  /* Talk cards — frosted glass */
-  .card {{
+  /* Frosted-glass panels */
+  .masthead, .card {{
     backdrop-filter: blur(14px) saturate(125%);
     -webkit-backdrop-filter: blur(14px) saturate(125%);
     background: rgba(255,255,255,0.09);
     border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 18px;
-    padding: 24px 28px;
     box-shadow: 0 8px 28px rgba(0,0,0,0.22);
-    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   }}
-  .card:hover {{
-    transform: translateY(-3px);
-    background: rgba(255,255,255,0.14);
-    border-color: rgba(255,255,255,0.32);
+  .masthead {{
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 30px 34px;
+    margin-bottom: 28px;
   }}
-  .card .meta {{
+  .masthead h1 {{ margin: 0; font-size: clamp(34px, 6vw, 52px); font-weight: 800; letter-spacing: -0.02em; color: #fff; }}
+  .meta {{
     font-family: {FONT_MONO};
-    font-size: 12px; letter-spacing: 0.12em;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
     color: rgba(243,240,251,0.72);
   }}
-  .card h2 {{ margin: 8px 0 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }}
-  .card .desc {{ margin: 8px 0 0; font-size: 16px; color: rgba(243,240,251,0.82); }}
-  .card.empty {{ text-align: center; color: rgba(243,240,251,0.7); }}
 
   .links {{ margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }}
   a.btn {{
@@ -328,23 +310,69 @@ def render(decks: list[dict]) -> str:
   }}
   a.reflink:hover {{ color: #fff; border-bottom-color: #fff; }}
 
-  /* External talks — the whole card is a link (stretched overlay) */
-  .card.external {{ position: relative; }}
-  .card.external h2 {{ margin-top: 4px; padding-right: 28px; }}
-  a.stretched {{ position: absolute; inset: 0; border-radius: inherit; z-index: 0; }}
-  .card.external .ext-arrow {{
-    position: absolute; top: 22px; right: 26px; z-index: 1;
-    font-size: 22px; line-height: 1; color: rgba(243,240,251,0.85);
-  }}
-  .card.external:hover .ext-arrow {{ color: #fff; }}
-  .card.external .meta, .card.external h2, .card.external .desc {{ position: relative; z-index: 1; pointer-events: none; }}
-  .card.external a.ontop {{ position: relative; z-index: 1; }}  /* clickable over the overlay */
-
   footer {{
     margin-top: 30px; text-align: center;
     color: rgba(243,240,251,0.7); font-size: 14px;
   }}
   footer a {{ color: #fff; text-decoration: underline; text-underline-offset: 3px; }}
+"""
+
+
+def render(decks: list[dict]) -> str:
+    cards = []
+    for deck in decks:
+        title = html.escape(deck["title"])
+        desc = html.escape(deck["description"])
+        date_str = html.escape(deck["date_str"])
+        if deck["kind"] == "external":
+            cards.append(render_external(deck, title, desc, date_str))
+        else:
+            cards.append(render_local(deck, title, desc, date_str))
+    body = "\n".join(cards) if cards else '      <li class="card empty">No presentations built yet.</li>'
+    count = f"{len(decks)} talk{'s' if len(decks) != 1 else ''}"
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talks &middot; Chris Burr</title>
+<style>{base_css()}
+  .masthead p {{
+    margin: 8px 0 0; font-size: 16px; letter-spacing: 0.04em;
+    text-transform: uppercase; color: rgba(243,240,251,0.78);
+    font-family: {FONT_MONO};
+  }}
+
+  ul.decks {{ list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }}
+
+  /* Talk cards — the whole card is a link (stretched overlay), with the
+     buttons and reference links raised above it */
+  .card {{
+    position: relative;
+    border-radius: 18px;
+    padding: 24px 28px;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }}
+  .card:hover {{
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.32);
+  }}
+  .card h2 {{ margin: 8px 0 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }}
+  .card .desc {{ margin: 8px 0 0; font-size: 16px; color: rgba(243,240,251,0.82); }}
+  .card.empty {{ text-align: center; color: rgba(243,240,251,0.7); }}
+  a.stretched {{ position: absolute; inset: 0; border-radius: inherit; z-index: 0; }}
+  .card .meta, .card h2, .card .desc {{ position: relative; z-index: 1; pointer-events: none; }}
+  .card .links a {{ position: relative; z-index: 1; }}  /* clickable over the overlay */
+
+  /* External talks get an ↗ marker */
+  .card.external h2 {{ margin-top: 4px; padding-right: 28px; }}
+  .card.external .ext-arrow {{
+    position: absolute; top: 22px; right: 26px; z-index: 1;
+    font-size: 22px; line-height: 1; color: rgba(243,240,251,0.85);
+  }}
+  .card.external:hover .ext-arrow {{ color: #fff; }}
 </style>
 </head>
 <body>
@@ -363,6 +391,65 @@ def render(decks: list[dict]) -> str:
 """
 
 
+def render_talk(deck: dict) -> str:
+    """A deck's own page: details, links, and the slides embedded."""
+    title = html.escape(deck["title"])
+    meta = " &middot; ".join(html.escape(x) for x in (deck["event"], deck["date_str"]) if x)
+    byline = " &middot; ".join(html.escape(x) for x in (deck["author"], deck["affiliation"]) if x)
+    subtitle = html.escape(deck["subtitle"])
+    desc = html.escape(deck["description"])
+    embed = ""
+    if deck["html"]:
+        src = html.escape(deck["html"])
+        embed = f"""
+    <div class="embed card">
+      <iframe src="{src}" title="{title} slides" allowfullscreen></iframe>
+    </div>"""
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title} &middot; Chris Burr</title>
+{f'<meta name="description" content="{desc}">' if desc else ''}
+<style>{base_css()}
+  .wrap {{ max-width: 1000px; }}
+  .back {{
+    display: inline-block; margin-bottom: 16px;
+    color: rgba(243,240,251,0.82); text-decoration: none; font-size: 15px;
+  }}
+  .back:hover {{ color: #fff; }}
+  .masthead h1 {{ margin-top: 10px; font-size: clamp(30px, 5vw, 44px); }}
+  .subtitle {{ margin: 6px 0 0; font-size: 20px; color: rgba(243,240,251,0.9); }}
+  .byline {{ margin: 14px 0 0; font-size: 15px; color: rgba(243,240,251,0.75); }}
+  .desc {{ margin: 14px 0 0; font-size: 16px; color: rgba(243,240,251,0.85); }}
+  .links {{ margin-top: 22px; }}
+  .embed {{ border-radius: 18px; padding: 10px; }}
+  .embed iframe {{
+    display: block; width: 100%; aspect-ratio: 16 / 9;
+    border: 0; border-radius: 10px; background: #000;
+  }}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../">&larr; All talks</a>
+    <header class="masthead">
+      {f'<div class="meta">{meta}</div>' if meta else ''}
+      <h1>{title}</h1>
+      {f'<p class="subtitle">{subtitle}</p>' if subtitle else ''}
+      {f'<p class="byline">{byline}</p>' if byline else ''}
+      {f'<p class="desc">{desc}</p>' if desc else ''}
+      <div class="links">{_buttons(deck)}{_reflinks(deck)}</div>
+    </header>{embed}
+    <footer>Built with <a href="https://marp.app/">Marp</a></footer>
+  </div>
+</body>
+</html>
+"""
+
+
 def main() -> int:
     decks = collect()
     out = ROOT / "index.html"
@@ -370,6 +457,8 @@ def main() -> int:
     print(f"wrote {out} ({len(decks)} presentation(s))")
     for deck in decks:
         print(f"  - {deck['slug']}: {deck['title']} [{deck['date_str'] or 'undated'}]")
+        if deck["kind"] == "local":
+            (ROOT / deck["slug"] / "index.html").write_text(render_talk(deck), encoding="utf-8")
     return 0
 
 

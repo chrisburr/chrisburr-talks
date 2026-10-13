@@ -7,8 +7,9 @@ deck written in Markdown and built with [Marp](https://marp.app/).
 
 ## View the talk
 
-- **Slides:** <https://chrisburr.github.io/chrisburr-talks/2026-09-21-leaps-rattlervfs-cvmfs/>
-- **PDF:** <https://chrisburr.github.io/chrisburr-talks/2026-09-21-leaps-rattlervfs-cvmfs/slides.pdf>
+- **Talk page:** <https://chrisburr.github.io/chrisburr-talks/2026-09-21-leaps-rattlervfs-cvmfs/>
+- **Slides:** <https://chrisburr.github.io/chrisburr-talks/2026-09-21-leaps-rattlervfs-cvmfs/slides.html>
+- **PDF:** <https://chrisburr.github.io/chrisburr-talks/2026-09-21-leaps-rattlervfs-cvmfs/2026-09-21-leaps-rattlervfs-cvmfs.pdf>
 - **All talks:** <https://chrisburr.github.io/chrisburr-talks/>
 
 The rendered links go live once the deck is built and deployed to GitHub

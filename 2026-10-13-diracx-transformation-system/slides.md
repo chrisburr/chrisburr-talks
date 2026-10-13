@@ -7,7 +7,7 @@ subtitle: "Workgraphs, transformations and parcels"
 author: "Chris Burr"
 affiliation: "CERN"
 event: "DIRAC Users' Workshop"
-event_url: ""
+event_url: "https://indico.cern.ch/event/1588323/contributions/7264643/"
 date: "2026-10-13"
 description: "What the DiracX Transformation System is, in the vocabulary of the DX-ADR-002 to DX-ADR-009 ADRs, and how it covers the use cases we need."
 ---

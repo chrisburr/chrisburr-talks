@@ -17,7 +17,7 @@ cmd = "npm ci --no-fund --no-audit --loglevel=error"
 inputs = ["package.json", "package-lock.json"]
 outputs = ["node_modules/.bin/marp"]
 
-# ---- build: every */slides.md -> slides.html + slides.pdf, in place ----
+# ---- build: every */slides.md -> slides.html + <deck>.pdf, in place ----
 [tasks.build]
 depends-on = ["_install"]
 cmd = "python scripts/build.py"
@@ -33,6 +33,6 @@ cmd = "npx marp --watch --server --theme-set ./theme/ --html {{ folder }}"
 args = ["name"]
 cmd = "python scripts/new_presentation.py {{ name }}"
 
-# ---- index: regenerate index.html ----
+# ---- index: regenerate index.html + each deck's talk page ----
 [tasks.index]
 cmd = "python scripts/build_index.py"

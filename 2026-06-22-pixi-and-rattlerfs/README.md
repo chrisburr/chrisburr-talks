@@ -7,8 +7,9 @@ deck written in Markdown and built with [Marp](https://marp.app/).
 
 ## View the talk
 
-- **Slides:** <https://chrisburr.github.io/chrisburr-talks/2026-06-22-pixi-and-rattlerfs/>
-- **PDF:** <https://chrisburr.github.io/chrisburr-talks/2026-06-22-pixi-and-rattlerfs/slides.pdf>
+- **Talk page:** <https://chrisburr.github.io/chrisburr-talks/2026-06-22-pixi-and-rattlerfs/>
+- **Slides:** <https://chrisburr.github.io/chrisburr-talks/2026-06-22-pixi-and-rattlerfs/slides.html>
+- **PDF:** <https://chrisburr.github.io/chrisburr-talks/2026-06-22-pixi-and-rattlerfs/2026-06-22-pixi-and-rattlerfs.pdf>
 - **Event page:** <https://indico.cern.ch/event/1696907/contributions/7143130/>
 - **All talks:** <https://chrisburr.github.io/chrisburr-talks/>
 

@@ -12,7 +12,7 @@ theme/
   fonts/  assets/      source fonts, masthead, logos
 scripts/
   build.py            build every deck -> HTML + PDF
-  build_index.py      generate index.html
+  build_index.py      generate index.html + per-deck talk pages
   new_presentation.py scaffold a new deck
 YYYY-MM-DD-name/
   slides.md           one deck (front-matter + slides)
@@ -28,13 +28,15 @@ pixi install                       # one-time toolchain setup
 pixi run new 2026-07-01-my-talk     # scaffold a new deck
 pixi run dev 2026-07-01-my-talk     # live preview (watch + server)
 pixi run build                      # build every deck to HTML + PDF
-pixi run index                      # regenerate index.html
+pixi run index                      # regenerate index.html + talk pages
 ```
 
 `pixi run build` and `pixi run index` also run automatically on every push to
 `main` (see `.github/workflows/deploy.yml`), which publishes `index.html` and
-all presentation folders to GitHub Pages. Each deck is served at a clean
-directory URL (`…/<deck>/`, via its `index.html`).
+all presentation folders to GitHub Pages. Each deck's directory URL
+(`…/<deck>/`) is its talk page — details, links and the slides embedded — with
+the slides themselves at `…/<deck>/slides.html` and the PDF named after the
+deck (`…/<deck>/<deck>.pdf`).
 
 Every **pull request** builds the decks too (`.github/workflows/pr-preview.yml`)
 — a CI gate that fails if a deck stops building, and a preview: the rendered
@@ -43,8 +45,8 @@ HTML + PDFs are uploaded as a run artifact, linked from a sticky PR comment.
 ### The index page
 
 The landing page (frosted-glass, built by `build_index.py`) lists every talk,
-newest first. Each built deck shows **View slides** / **PDF**, plus **Indico**
-(if the deck sets `event_url`) and a **Source** link to its folder on GitHub
+newest first. Each card links to the deck's talk page and shows **View slides**
+/ **PDF**, plus **Indico** (if the deck sets `event_url`) and a **Source** link to its folder on GitHub
 (derived from the git remote). Old talks not built in this repo can be listed
 too — add them to **`external-talks.json`**, where each entry is a whole-card
 external link:

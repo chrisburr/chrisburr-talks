@@ -83,4 +83,4 @@ jobs:
 
             Download the rendered slides from this run's **[artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)** (`slides-pr-${{ github.event.number }}`).
 
-            After unzipping, open a deck's **`slides.pdf`** to flip through it, or **`<deck>/index.html`** for the live version.
+            After unzipping, open a deck's **`<deck>/<deck>.pdf`** to flip through it, or **`<deck>/slides.html`** for the live version.
