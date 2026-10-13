@@ -39,6 +39,11 @@ section:not(:has(.reveal-group.is-hidden .rv-add)) .stack > .base-only { visibil
 /* the definition quotes: the term being introduced stands out from the grey */
 section .defn { font-size: 23px; max-width: 64ch; }
 section blockquote strong { color: var(--ink); }
+
+/* transformation names in the text, coloured like their tiles in the diagrams */
+section .tc-gen { color: #2D6CDF; }
+section .tc-p1  { color: #E8810B; }
+section .tc-p2  { color: #8B3FA0; }
 </style>
 
 # Before we start
@@ -396,6 +401,290 @@ A **workgraph** is a directed acyclic graph of **transformations**. It is what D
 
 <!-- _class: build -->
 
+# Many outputs
+
+<div class="cols">
+<div>
+
+- One step, several outputs
+- A consumer consumes one output
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 560px">
+<img class="diagram base-only" src="assets/diagrams/many-base.svg" alt="Processing workgraph where Process emits three file types, each consumed by its own Merge and delivered as its own dataset">
+<img class="diagram add" src="assets/diagrams/many.svg" alt="Processing workgraph where Process emits three file types, each consumed by its own Merge and delivered as its own dataset">
+</div>
+
+</div>
+</div>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Forking outputs
+
+<div class="cols">
+<div>
+
+- One output, **many consumers**
+- One input per consumer
+  - Each input is processed once
+- Each consumer tracks it's own progress
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 540px">
+<img class="diagram base-only" src="assets/diagrams/fanout-base.svg" alt="Processing workgraph where the single Process output forks: the same files go to both Merge and an extra Selection transformation with its own output">
+<img class="diagram add" src="assets/diagrams/fanout.svg" alt="Processing workgraph where the single Process output forks: the same files go to both Merge and an extra Selection transformation with its own output">
+</div>
+
+</div>
+</div>
+
+<span class="rv"></span>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Removing replicas after N uses
+
+<div class="cols">
+<div>
+
+- A **removal** transformation
+  - fed by the same output
+- Its packer delays each file until **all N consumers** have processed it
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 560px">
+<img class="diagram base-only" src="assets/diagrams/removal-base.svg" alt="Processing workgraph where the Process output forks to Merge, a removal data transformation in the middle, and a Selection; the removal waits until both Merge and Selection have processed each file">
+<img class="diagram add" src="assets/diagrams/removal.svg" alt="Processing workgraph where the Process output forks to Merge, a removal data transformation in the middle, and a Selection; the removal waits until both Merge and Selection have processed each file">
+</div>
+
+</div>
+</div>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Correlated processing (external)
+
+<div class="cols">
+<div>
+
+- An file  has to be processed with its **ancestor**
+- The inputs holds only one of the datasets
+    - The **packer** looks up each ancestor and adds it to the parcel
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 540px">
+<img class="diagram base-only" src="assets/diagrams/rdst-base.svg" alt="Processing workgraph fed by an RDST query; the Process packer looks up each RDST&#x27;s RAW ancestor in the bookkeeping and adds it to the parcel">
+<img class="diagram add" src="assets/diagrams/rdst.svg" alt="Processing workgraph fed by an RDST query; the Process packer looks up each RDST&#x27;s RAW ancestor in the bookkeeping and adds it to the parcel">
+</div>
+
+</div>
+</div>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Correlated processing (internal)
+
+<div class="cols">
+<div>
+
+- The same shape, inside one workgraph
+- <strong class="tc-p2">Process 2</strong> needs both:
+  - <strong class="tc-p1">Process 1</strong> output
+  - <strong class="tc-gen">Generate</strong> output
+- Its pool is fed by <strong class="tc-p1">Process 1</strong>
+    - The **packer** adds the matching <strong class="tc-gen">Generate</strong> file to the **parcel**
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 540px">
+<img class="diagram base-only" src="assets/diagrams/join-base.svg" alt="Simulation workgraph: seeds, Generate, Process 1, Process 2, Merge; Process 2 also takes the Generate output that each Process 1 file came from">
+<img class="diagram add" src="assets/diagrams/join.svg" alt="Simulation workgraph: seeds, Generate, Process 1, Process 2, Merge; Process 2 also takes the Generate output that each Process 1 file came from">
+</div>
+
+</div>
+</div>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Staging input
+
+<div class="cols">
+<div>
+
+- Raw data lives on **tape**
+- A **data transformation** stages it
+    - Shares the processing step's query
+- **Packer delays** each file until on buffer
+    - The input just waits in the pool
+    - Same mechanism can be used for site downtime, waiting calibrations, etc.
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 560px">
+<img class="diagram base-only" src="assets/diagrams/staging-base.svg" alt="Processing workgraph with a staging data transformation sharing its query; the Process packer delays each file until its staged replica exists">
+<img class="diagram add" src="assets/diagrams/staging.svg" alt="Processing workgraph with a staging data transformation sharing its query; the Process packer delays each file until its staged replica exists">
+</div>
+
+</div>
+</div>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Single outputs
+
+<div class="cols">
+<div>
+
+- **Example:** Every job also writes small files e.g. monitoring histograms
+- Declare a **second output** of the step
+- Two options:
+    - **transformation** fed by that output,
+      its packer waits for feeder to finish
+    - **finalizing action** runs in DiracX tasks
+- Not mutually exclusive
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 540px">
+<img class="diagram base-only" src="assets/diagrams/histograms-base.svg" alt="Processing workgraph where Process also emits histograms, merged by an extra histogram-merge transformation into a histograms output">
+<img class="diagram add" src="assets/diagrams/histograms.svg" alt="Processing workgraph where Process also emits histograms, merged by an extra histogram-merge transformation into a histograms output">
+</div>
+
+</div>
+</div>
+
+
+<span class="rv"></span>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+<!-- _class: build -->
+
+# Keeping intermediate files
+
+<div class="cols">
+<div>
+
+- Intermediate outputs are **transient**
+- Want to keep one?
+  **Declare it as an output** of the workgraph
+
+</div>
+<div>
+
+<div class="stack" style="max-width: 540px">
+<img class="diagram base-only" src="assets/diagrams/keep-base.svg" alt="Simulation workgraph where the Process output is also declared as a workgraph output and kept as a second dataset">
+<img class="diagram add" src="assets/diagrams/keep.svg" alt="Simulation workgraph where the Process output is also declared as a workgraph output and kept as a second dataset">
+</div>
+
+</div>
+</div>
+
+
+<span class="rv"></span>
+
+<!-- step -->
+
+<span class="rv rv-add"></span>
+
+---
+
+# Retrying
+
+<div class="cols">
+<div>
+
+- A parcel is **never** retried, its **inputs** are
+- A **hook** decides each failed input's fate:
+    - back to `Unassigned`, and repacked (maybe differently)
+    - or `Problematic`, for an operator
+- Still processed exactly once, or not at all
+
+</div>
+<div>
+
+<img class="diagram" src="assets/diagrams/retry.svg" alt="Inside one transformation: a parcel fails, its inputs go to the HandleFailedInput hook, which returns them to the pool or quarantines them as Problematic" style="max-width: 600px">
+
+</div>
+</div>
+
+---
+
+# Splitting
+
+<div class="cols">
+<div>
+
+- A job processed **part** of its input
+- Input status is `Split`, two inputs added
+    - a `Processed` child
+    - an `Unassigned` child
+- `Unassigned` child could also be directly marked `Problematic` or `NotProcessed`
+
+</div>
+<div>
+
+<img class="diagram" src="assets/diagrams/split.svg" alt="A parcel processes only part of its input file: the parent input becomes Split, the processed part a Processed child, the rest an Unassigned child back in the pool" style="max-width: 600px">
+
+</div>
+</div>
+
+---
+
+<!-- _class: build -->
+
 # Scouting
 
 <div class="cols">
@@ -456,8 +745,6 @@ A **workgraph** is a directed acyclic graph of **transformations**. It is what D
 </div>
 </div>
 
-<!-- step -->
-
 <span class="rv"></span>
 
 <!-- step -->
@@ -468,15 +755,15 @@ A **workgraph** is a directed acyclic graph of **transformations**. It is what D
 
 <!-- _class: build -->
 
-# An LHCb example: PPG approval
+# Manual approval(s)
 
 <div class="cols">
 <div>
 
-- Another approving action
-    - LHCb's, so it lives in an extension
-- Usage scaled to the full request exceeds what was approved?
-    - Flag it for a second approval
+- Actions can manual sign-off steps, e.g.
+    - Resource usage higher than expected?
+    - Validate scouting results
+    - Operations
 
 </div>
 <div>
@@ -498,310 +785,22 @@ A **workgraph** is a directed acyclic graph of **transformations**. It is what D
 
 ---
 
-<!-- _class: build -->
-
-# Keeping intermediate files
-
-<div class="cols">
-<div>
-
-- Intermediate outputs are **transient**
-- Want to keep one?
-  **Declare it as an output** of the workgraph
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 540px">
-<img class="diagram base-only" src="assets/diagrams/keep-base.svg" alt="Simulation workgraph where the Process output is also declared as a workgraph output and kept as a second dataset">
-<img class="diagram add" src="assets/diagrams/keep.svg" alt="Simulation workgraph where the Process output is also declared as a workgraph output and kept as a second dataset">
-</div>
-
-</div>
-</div>
-
-
-<span class="rv"></span>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-<!-- _class: build -->
-
-# Single outputs
-
-<div class="cols">
-<div>
-
-- Want **one** file at the end?
-- The packer knows whether its feeder is still running
-    - Hold everything back until upstream is done
-    - Then pack it all into one parcel
-- Or: a finalizing action
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 540px">
-<img class="diagram base-only" src="assets/diagrams/single-base.svg" alt="Processing workgraph whose Merge packer waits for its feeder to finish and packs everything into one parcel, giving a single output file">
-<img class="diagram add" src="assets/diagrams/single.svg" alt="Processing workgraph whose Merge packer waits for its feeder to finish and packs everything into one parcel, giving a single output file">
-</div>
-
-</div>
-</div>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-<!-- _class: build -->
-
-# Histograms
-
-<div class="cols">
-<div>
-
-- Every job also writes small files
-  e.g. monitoring histograms
-- Declare a **second output** of the step
-- Two options:
-    - **transformation** fed by that output
-    - **finalizing action**
-- Not mutually exclusive
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 540px">
-<img class="diagram base-only" src="assets/diagrams/histograms-base.svg" alt="Processing workgraph where Process also emits histograms, merged by an extra histogram-merge transformation into a histograms output">
-<img class="diagram add" src="assets/diagrams/histograms.svg" alt="Processing workgraph where Process also emits histograms, merged by an extra histogram-merge transformation into a histograms output">
-</div>
-
-</div>
-</div>
-
-
-<span class="rv"></span>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-<!-- _class: build -->
-
-# Processing outputs multiple times
-
-<div class="cols">
-<div>
-
-- One output, **many consumers**
-- Each consumer keeps its own bookmark
-    - A fan-out costs nothing
-    - A consumer can be added later
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 540px">
-<img class="diagram base-only" src="assets/diagrams/fanout-base.svg" alt="Processing workgraph where the Process output feeds both Merge and an extra Selection transformation with its own output">
-<img class="diagram add" src="assets/diagrams/fanout.svg" alt="Processing workgraph where the Process output feeds both Merge and an extra Selection transformation with its own output">
-</div>
-
-</div>
-</div>
-
-<span class="rv"></span>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-<!-- _class: build -->
-
-# Correlated processing (RDST)
-
-<div class="cols">
-<div>
-
-- An RDST has to be processed with its **RAW ancestor**
-- The pool holds only RDSTs
-    - The **packer** looks up each ancestor and adds it to the parcel
-    - …and delays the RDST until both are staged
-- Joining two outputs of one workgraph is the same shape
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 540px">
-<img class="diagram base-only" src="assets/diagrams/rdst-base.svg" alt="Processing workgraph fed by an RDST query; the Process packer looks up each RDST&#x27;s RAW ancestor in the bookkeeping and adds it to the parcel">
-<img class="diagram add" src="assets/diagrams/rdst.svg" alt="Processing workgraph fed by an RDST query; the Process packer looks up each RDST&#x27;s RAW ancestor in the bookkeeping and adds it to the parcel">
-</div>
-
-</div>
-</div>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-<!-- _class: build -->
-
-# Many outputs
-
-<div class="cols">
-<div>
-
-- One step, several **file types**
-- A consumer takes **one type**
-    - One merge per type
-- Every output is consumed or declared
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 560px">
-<img class="diagram base-only" src="assets/diagrams/many-base.svg" alt="Processing workgraph where Process emits three file types, each consumed by its own Merge and delivered as its own dataset">
-<img class="diagram add" src="assets/diagrams/many.svg" alt="Processing workgraph where Process emits three file types, each consumed by its own Merge and delivered as its own dataset">
-</div>
-
-</div>
-</div>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-# Retrying
-
-<div class="cols">
-<div>
-
-- A parcel is **never** retried, its **inputs** are
-- A **hook** decides each failed input's fate:
-    - back to `Unassigned`, and repacked (maybe differently)
-    - or `Problematic`, for an operator
-- Still processed exactly once, or not at all
-
-</div>
-<div>
-
-<img class="diagram" src="assets/diagrams/retry.svg" alt="Inside one transformation: a parcel fails, its inputs go to the HandleFailedInput hook, which returns them to the pool or quarantines them as Problematic" style="max-width: 600px">
-
-</div>
-</div>
-
----
-
-# Splitting
-
-<div class="cols">
-<div>
-
-- A job processed **part** of its input
-    - The CMS case: some luminosity sections of a file
-- The parent becomes `Split`
-    - the processed part → a `Processed` child
-    - the rest → an `Unassigned` child, packed again
-- Children keep their parent's file and lineage
-
-</div>
-<div>
-
-<img class="diagram" src="assets/diagrams/split.svg" alt="A parcel processes only part of its input file: the parent input becomes Split, the processed part a Processed child, the rest an Unassigned child back in the pool" style="max-width: 600px">
-
-</div>
-</div>
-
----
-
-<!-- _class: build -->
-
-# Staging input
-
-<div class="cols">
-<div>
-
-- Raw data lives on **tape**
-- A **data transformation** stages it to a buffer
-    - Shares the processing step's query
-- The processing **packer delays** each file until its replica exists
-    - Delay isn't a state, the input just waits in the pool
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 560px">
-<img class="diagram base-only" src="assets/diagrams/staging-base.svg" alt="Processing workgraph with a staging data transformation sharing its query; the Process packer delays each file until its staged replica exists">
-<img class="diagram add" src="assets/diagrams/staging.svg" alt="Processing workgraph with a staging data transformation sharing its query; the Process packer delays each file until its staged replica exists">
-</div>
-
-</div>
-</div>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
-<!-- _class: build -->
-
-# Removing replicas after N uses
-
-<div class="cols">
-<div>
-
-- A **removal** transformation, fed by the same output
-- Its packer delays each file until **all N consumers** have processed it
-- A file a consumer wrote off stays, so someone can look at it
-- Same pattern for buffer copies after staging
-
-</div>
-<div>
-
-<div class="stack" style="max-width: 560px">
-<img class="diagram base-only" src="assets/diagrams/removal-base.svg" alt="Processing workgraph where Process feeds Merge and a Selection, and a removal data transformation fed by the same output waits until both have processed each file">
-<img class="diagram add" src="assets/diagrams/removal.svg" alt="Processing workgraph where Process feeds Merge and a Selection, and a removal data transformation fed by the same output waits until both have processed each file">
-</div>
-
-</div>
-</div>
-
-<!-- step -->
-
-<span class="rv rv-add"></span>
-
----
-
 # …and what did we miss?
 
 - Have a use case that **doesn't** fit? We want to hear about it this week
-- Bring it to the **CWL hackathon** hackathon track
+- Bring it to the **CWL hackathon**
 
 ---
 
 <!-- _class: section -->
 
-# Going further
+# Future plans
 
 ---
 
 <!-- _class: build -->
 
-# Going further
+# Future plans
 
 - **Operations / transformation debugging**
     - Why is this input `Problematic`? Where did this file come from?
