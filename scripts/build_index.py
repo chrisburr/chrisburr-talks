@@ -398,9 +398,15 @@ def render_talk(deck: dict) -> str:
     byline = " &middot; ".join(html.escape(x) for x in (deck["author"], deck["affiliation"]) if x)
     subtitle = html.escape(deck["subtitle"])
     desc = html.escape(deck["description"])
-    embed = ""
+    embed = forward = ""
     if deck["html"]:
         src = html.escape(deck["html"])
+        # This URL used to serve the slides directly: forward old slide links
+        # (…/<deck>/#5) on to the slides themselves.
+        forward = f"""<script>
+  if (/^#\\d+/.test(location.hash)) location.replace("{src}" + location.hash);
+</script>
+"""
         embed = f"""
     <div class="embed card">
       <iframe src="{src}" title="{title} slides" allowfullscreen></iframe>
@@ -413,7 +419,7 @@ def render_talk(deck: dict) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} &middot; Chris Burr</title>
 {f'<meta name="description" content="{desc}">' if desc else ''}
-<style>{base_css()}
+{forward}<style>{base_css()}
   .wrap {{ max-width: 1000px; }}
   .back {{
     display: inline-block; margin-bottom: 16px;

@@ -60,6 +60,9 @@ jobs:
               echo "publishing ${d}"
               mkdir -p "_site/${d}"
               cp -r "${d}." "_site/${d}"
+              # Old links pointed at <deck>/slides.pdf; Pages can't redirect,
+              # so keep a copy there.
+              cp "${d}${d%/}.pdf" "_site/${d}slides.pdf"
             fi
           done
 
