@@ -4,7 +4,7 @@ theme: cburr
 paginate: true
 title: "The DiracX Transformation System"
 subtitle: "Workgraphs, transformations and parcels"
-author: "Chris Burr"
+author: "Chris²"
 affiliation: "CERN"
 event: "DIRAC Users' Workshop"
 event_url: "https://indico.cern.ch/event/1588323/contributions/7264643/"
