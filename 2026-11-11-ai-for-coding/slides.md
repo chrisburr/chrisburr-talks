@@ -17,7 +17,6 @@ description: "How I use AI coding agents for LHCb software, computing and docume
 section.build.card .reveal-card figure { margin: 0; }
 section.build.card .reveal-card figure img { max-height: 540px; max-width: 1140px; width: auto; display: block; margin: 0 auto; }
 section.build.card .reveal-card:has(figure) { width: auto; padding: var(--sp-4); }
-section.build.card .reveal-card img[src*="artifact-mockups"] { max-height: 470px; }
 section.build.card .reveal-card img[src*="github-contributions"],
 section.build.card .reveal-card img[src*="diracx-diagram"] { max-height: 440px; }
 
@@ -398,16 +397,24 @@ $ glab mr view 1234 --comments
 
 ---
 
-<!-- _class: build card -->
-
 # Tools: artifacts
+
+<div class="cols" style="grid-template-columns: 2fr 3fr">
+<div>
 
 - **Artifacts:** small web pages for reports, mockups and plots
     - My investigations end up as a page I can share, not a wall of text
 
-<!-- step -->
-<p class="step-title">Four mockups for one panel of a page about MC requests</p>
-<figure><img src="assets/artifact-mockups.jpg" alt="Four mockup layouts (A to D) for showing the event types of an MC request"></figure>
+</div>
+<div>
+
+<figure>
+  <img src="assets/artifact-mockups.jpg" alt="Four mockup layouts (A to D) for showing the event types of an MC request" style="max-height: 480px">
+  <figcaption>Four mockups for one panel of a page about MC requests</figcaption>
+</figure>
+
+</div>
+</div>
 
 ---
 
