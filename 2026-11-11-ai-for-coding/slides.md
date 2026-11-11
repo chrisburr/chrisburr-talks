@@ -442,6 +442,7 @@ $ glab mr view 1234 --comments
 - Every tool call is a decision: ask you, allow, or deny
     - Approving every `ls` gets old very quickly
     - Accidentally doing `rm -rf $UNSET_VAR*` sucks...
+    - Intention: Contributing to AP is different to ROOT
 
 - **Prompt injection:**
     - Anything it reads can contain instructions
