@@ -495,27 +495,27 @@ $ glab mr view 1234 --comments
 
 # How long can you look away?
 
-<svg class="hd" viewBox="60 45 860 475" role="img" aria-label="A staircase from Tab completion (seconds) to chat (one answer) to a harness approving each command (minutes) to auto mode (an hour) to parallel background agents (overnight)">
+<svg class="hd" viewBox="60 15 950 505" role="img" aria-label="A staircase from Tab completion (seconds) to chat (one answer) to a harness approving each command (minutes) to auto mode (an hour) to parallel background agents (overnight) to many agents on many machines (scaling even further)">
 <defs>
-<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4A1789"/></marker>
 <marker id="ah-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6C7280"/></marker>
-<marker id="ah-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1F9D55"/></marker>
 </defs>
-<line x1="70" y1="470" x2="910" y2="470" stroke="#6C7280" stroke-width="2" marker-end="url(#ah-muted)"/>
-<text x="910" y="505" text-anchor="end" font-size="18" fill="#6C7280">more autonomy →</text>
+<line x1="70" y1="470" x2="1000" y2="470" stroke="#6C7280" stroke-width="2" marker-end="url(#ah-muted)"/>
+<text x="1000" y="505" text-anchor="end" font-size="18" fill="#6C7280">more autonomy →</text>
 <g font-size="19">
-<rect x="80" y="400" width="150" height="70" fill="#EFE9F8"/>
-<rect x="240" y="330" width="150" height="140" fill="#DCCFF0"/>
-<rect x="400" y="255" width="150" height="215" fill="#B9A2E0"/>
-<rect x="560" y="175" width="150" height="295" fill="#6A3FA8"/>
-<rect x="720" y="90" width="150" height="380" fill="#4A1789"/>
-<text x="155" y="380" text-anchor="middle" font-weight="700" fill="#4A1789">Tab</text><text x="155" y="440" text-anchor="middle" fill="#4A1789">seconds</text>
-<text x="315" y="310" text-anchor="middle" font-weight="700" fill="#4A1789">Chat</text><text x="315" y="370" text-anchor="middle" fill="#4A1789">one answer</text>
-<text x="475" y="235" text-anchor="middle" font-weight="700" fill="#4A1789">Harness</text><text x="475" y="295" text-anchor="middle" fill="#2A1450">approve each</text><text x="475" y="318" text-anchor="middle" fill="#2A1450">command</text><text x="475" y="350" text-anchor="middle" fill="#2A1450">minutes</text>
-<text x="635" y="155" text-anchor="middle" font-weight="700" fill="#4A1789">Auto mode</text><text x="635" y="215" text-anchor="middle" fill="#fff">an hour</text>
-<text x="795" y="70" text-anchor="middle" font-weight="700" fill="#4A1789">Many agents</text><text x="795" y="130" text-anchor="middle" fill="#fff">in parallel,</text><text x="795" y="153" text-anchor="middle" fill="#fff">overnight</text>
-<g font-family="Fira Mono, monospace" font-size="17" fill="#6C7280">
-<text x="155" y="462" text-anchor="middle" fill="#4A1789">2021</text><text x="315" y="462" text-anchor="middle" fill="#4A1789">2023</text><text x="475" y="462" text-anchor="middle" fill="#2A1450">2025</text><text x="635" y="462" text-anchor="middle" fill="#E9DFF7">2026</text><text x="795" y="462" text-anchor="middle" fill="#E9DFF7">2026</text>
+<rect x="80" y="400" width="140" height="70" fill="#EFE9F8"/>
+<rect x="230" y="335" width="140" height="135" fill="#DCCFF0"/>
+<rect x="380" y="265" width="140" height="205" fill="#B9A2E0"/>
+<rect x="530" y="195" width="140" height="275" fill="#6A3FA8"/>
+<rect x="680" y="125" width="140" height="345" fill="#4A1789"/>
+<rect x="830" y="55" width="140" height="415" fill="#2A1450"/>
+<text x="150" y="380" text-anchor="middle" font-weight="700" fill="#4A1789">Tab</text><text x="150" y="440" text-anchor="middle" fill="#4A1789">seconds</text>
+<text x="300" y="315" text-anchor="middle" font-weight="700" fill="#4A1789">Chat</text><text x="300" y="375" text-anchor="middle" fill="#4A1789">one answer</text>
+<text x="450" y="245" text-anchor="middle" font-weight="700" fill="#4A1789">Harness</text><text x="450" y="305" text-anchor="middle" fill="#2A1450">approve each</text><text x="450" y="328" text-anchor="middle" fill="#2A1450">command</text><text x="450" y="360" text-anchor="middle" fill="#2A1450">minutes</text>
+<text x="600" y="175" text-anchor="middle" font-weight="700" fill="#4A1789">Auto mode</text><text x="600" y="235" text-anchor="middle" fill="#fff">an hour</text>
+<text x="750" y="105" text-anchor="middle" font-weight="700" fill="#4A1789">Many agents</text><text x="750" y="165" text-anchor="middle" fill="#fff">in parallel,</text><text x="750" y="188" text-anchor="middle" fill="#fff">overnight</text>
+<text x="900" y="35" text-anchor="middle" font-weight="700" fill="#4A1789">Many machines</text><text x="900" y="95" text-anchor="middle" fill="#fff">many agents,</text><text x="900" y="118" text-anchor="middle" fill="#fff">scale even</text><text x="900" y="141" text-anchor="middle" fill="#fff">further</text>
+<g font-family="Fira Mono, monospace" font-size="17">
+<text x="150" y="462" text-anchor="middle" fill="#4A1789">2021</text><text x="300" y="462" text-anchor="middle" fill="#4A1789">2023</text><text x="450" y="462" text-anchor="middle" fill="#2A1450">2025</text><text x="600" y="462" text-anchor="middle" fill="#E9DFF7">2026</text><text x="750" y="462" text-anchor="middle" fill="#E9DFF7">2026</text><text x="900" y="462" text-anchor="middle" fill="#E9DFF7">2026</text>
 </g>
 </g>
 </svg>
