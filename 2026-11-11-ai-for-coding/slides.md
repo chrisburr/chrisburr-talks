@@ -399,22 +399,13 @@ $ glab mr view 1234 --comments
 
 # Tools: artifacts
 
-<div class="cols" style="grid-template-columns: 2fr 3fr">
-<div>
-
 - **Artifacts:** small web pages for reports, mockups and plots
     - My investigations end up as a page I can share, not a wall of text
 
-</div>
-<div>
-
 <figure>
-  <img src="assets/artifact-mockups.jpg" alt="Four mockup layouts (A to D) for showing the event types of an MC request" style="max-height: 480px">
+  <img src="assets/artifact-mockups.jpg" alt="Four mockup layouts (A to D) for showing the event types of an MC request" style="height: 400px; max-height: none">
   <figcaption>Four mockups for one panel of a page about MC requests</figcaption>
 </figure>
-
-</div>
-</div>
 
 ---
 
