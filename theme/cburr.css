@@ -398,6 +398,31 @@ section .src {
   text-align: center;
 }
 
+/* ---------- Tables (Markdown pipe tables) ----------
+   Compact and centred, with a brand-ink header rule and faint row rules.
+   Cells default to left; per-column alignment from the Markdown (`|---:|`)
+   wins because markdown-it writes it inline. Tabular figures keep numbers
+   lined up when right-aligned. */
+section table {
+  border-collapse: collapse;
+  margin: var(--sp-4) auto;
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-tight);
+  font-variant-numeric: tabular-nums;
+}
+section th, section td {
+  padding: 0.3em 0.8em;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--grid);
+}
+section th {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+section tbody tr:last-child td { border-bottom: none; }
+
 /* ---------- Badge image (logo / accent) ----------
    A small image floated over the body as a corner badge: absolutely positioned,
    so it never reflows the surrounding text. Pick a position with a corner
